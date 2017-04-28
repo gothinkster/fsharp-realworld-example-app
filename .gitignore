@@ -17,3 +17,5 @@
 Thumbs.db
 backend/suaveio/obj
 backend/suaveio/bin
+suaveio/bin
+suaveio/obj
