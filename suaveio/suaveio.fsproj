@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="lib/Models.fs" />
+    <Compile Include="lib/Stubs.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
