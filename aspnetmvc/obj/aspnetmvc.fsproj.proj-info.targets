@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+        <Target Name="_Inspect_FscArgs"
+          DependsOnTargets="ResolveReferences;CoreCompile">
+    <Message Text="%(FscCommandLineArgs.Identity)" Importance="High" />
+    <WriteLinesToFile
+            Condition=" '$(_Inspect_FscArgs_OutFile)' != '' "
+            File="$(_Inspect_FscArgs_OutFile)"
+            Lines="@(FscCommandLineArgs -> '%(Identity)')"
+            Overwrite="true" 
+            Encoding="UTF-8"/>
+    <!-- WriteLinesToFile doesnt create the file if @(FscCommandLineArgs) is empty -->
+    <Touch
+        Condition=" '$(_Inspect_FscArgs_OutFile)' != '' "
+        Files="$(_Inspect_FscArgs_OutFile)"
+        AlwaysCreate="True" />
+  </Target>
+<Target Name="_Inspect_GetProjectReferences">
+    <Message Text="%(ProjectReference.FullPath)" Importance="High" />
+    <WriteLinesToFile
+            Condition=" '$(_Inspect_GetProjectReferences_OutFile)' != '' "
+            File="$(_Inspect_GetProjectReferences_OutFile)"
+            Lines="@(ProjectReference -> '%(FullPath)')"
+            Overwrite="true"
+            Encoding="UTF-8"/>
+    <!-- WriteLinesToFile doesnt create the file if @(ProjectReference) is empty -->
+    <Touch
+        Condition=" '$(_Inspect_GetProjectReferences_OutFile)' != '' "
+        Files="$(_Inspect_GetProjectReferences_OutFile)"
+        AlwaysCreate="True" />
+  </Target>
+
+  <Target Name="_Inspect_GetProperties"
+          DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+        
+        <_Inspect_GetProperties_OutLines Include="P0">
+            <PropertyName>TargetPath</PropertyName>
+            <PropertyValue>$(TargetPath)</PropertyValue>
+        </_Inspect_GetProperties_OutLines></ItemGroup>
+    <Message Text="%(_Inspect_GetProperties_OutLines.PropertyName)=%(_Inspect_GetProperties_OutLines.PropertyValue)" Importance="High" />
+    <WriteLinesToFile
+            Condition=" '$(_Inspect_GetProperties_OutFile)' != '' "
+            File="$(_Inspect_GetProperties_OutFile)"
+            Lines="@(_Inspect_GetProperties_OutLines -> '%(PropertyName)=%(PropertyValue)')"
+            Overwrite="true" 
+            Encoding="UTF-8"/>
+  </Target>
+</Project>

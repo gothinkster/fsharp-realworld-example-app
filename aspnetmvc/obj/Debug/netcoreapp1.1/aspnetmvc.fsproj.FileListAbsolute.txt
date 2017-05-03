@@ -1,0 +1,7 @@
+/Users/Lee1/Documents/realworld_fsharp/aspnetmvc/bin/Debug/netcoreapp1.1/aspnetmvc.deps.json
+/Users/Lee1/Documents/realworld_fsharp/aspnetmvc/bin/Debug/netcoreapp1.1/aspnetmvc.runtimeconfig.json
+/Users/Lee1/Documents/realworld_fsharp/aspnetmvc/bin/Debug/netcoreapp1.1/aspnetmvc.runtimeconfig.dev.json
+/Users/Lee1/Documents/realworld_fsharp/aspnetmvc/bin/Debug/netcoreapp1.1/aspnetmvc.dll
+/Users/Lee1/Documents/realworld_fsharp/aspnetmvc/bin/Debug/netcoreapp1.1/aspnetmvc.pdb
+/Users/Lee1/Documents/realworld_fsharp/aspnetmvc/obj/Debug/netcoreapp1.1/aspnetmvc.dll
+/Users/Lee1/Documents/realworld_fsharp/aspnetmvc/obj/Debug/netcoreapp1.1/aspnetmvc.pdb

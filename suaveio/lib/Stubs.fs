@@ -17,7 +17,7 @@ module Responses =
                   Bio = "This is a test bio";
                   Image = "";
         }
-    } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
+    } |> toJson |> System.Text.Encoding.UTF8.GetString
 
   let singleProfile = 
     {
@@ -54,7 +54,7 @@ module Responses =
 
   let tagList = 
     {
-      Tags = ["programming"; "functional"]
+      Tags = [|"test"; "functional"|]
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let singleComment = 
@@ -70,7 +70,7 @@ module Responses =
 
   let multipleComments = 
     {
-      Comments = [
+      Comments = [|
                   {
                     Id = 8293u;
                     CreatedAt = "";
@@ -78,11 +78,11 @@ module Responses =
                     Body = "this is a fake comment";
                     Author = getFakeAuthor;
                   }
-      ]  
+      |]  
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let multiArticle title description body = 
-    [
+    [|
       {
         Slug = "Not sure what this is";
         Title = title;
@@ -105,11 +105,10 @@ module Responses =
         FavoritesCount = 2u;
         Author = getFakeAuthor;
       }
-    ]
+    |]
 
   let multipleArticles = 
     {
       Articles = multiArticle "test title" "some new description" "some presentation body";
       ArticlesCount = 2u;
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
-    

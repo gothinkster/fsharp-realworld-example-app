@@ -4,10 +4,16 @@ open Suave.Http
 open Suave.Operators
 open Suave.Filters
 open RealWorld.Stubs
+open System.IO
+open Microsoft.Extensions.Configuration
 
 let serverConfig = 
   { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8070] }
 
+let getConfigDbConnection = 
+  let builder = ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json")
+  builder.Build()
+  
 // TODO: Replace each return comments with function to carry out the action.
 let app = 
   choose [
@@ -28,12 +34,13 @@ let app =
     DELETE >=> path "/articles/:slug/comments/:id" >=> (Successful.OK Responses.multipleComments)
     POST >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
     DELETE >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
-    POST >=> path "/articles" >=> (Successful.OK Responses.singleArticle ) // Creates a new article
+    POST >=> path "/articles" >=> (Successful.OK Responses.singleArticle) // Creates a new article
     GET >=> path "/tags" >=> (Successful.OK Responses.tagList)
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
 
 [<EntryPoint>]
 let main argv =
+  printfn "%A" (getConfigDbConnection.GetValue("ConnectionStrings:DefaultConnection"))
   startWebServer serverConfig app
   0
