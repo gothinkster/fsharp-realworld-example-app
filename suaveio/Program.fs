@@ -6,16 +6,13 @@ open Suave.Filters
 open RealWorld.Stubs
 open System.IO
 open Microsoft.Extensions.Configuration
+open MongoDB.Driver
 
 let serverConfig = 
   { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8070] }
-
-let getConfigDbConnection = 
-  let builder = ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json")
-  builder.Build()
   
 // TODO: Replace each return comments with function to carry out the action.
-let app = 
+let app dbClient = 
   choose [
     POST >=> path "/users/login" >=> (Successful.OK Responses.usersLogin)
     POST >=> path "/users" >=> (Successful.OK Responses.usersLogin)
@@ -41,6 +38,5 @@ let app =
 
 [<EntryPoint>]
 let main argv =
-  printfn "%A" (getConfigDbConnection.GetValue("ConnectionStrings:DefaultConnection"))
-  startWebServer serverConfig app
+  startWebServer serverConfig (RealWorld.Effects.DB.getDBClient () |> app)
   0
