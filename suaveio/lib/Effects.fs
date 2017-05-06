@@ -20,10 +20,13 @@ module DB =
     client.GetDatabase(getConfigDbConnection.GetValue("ConnectionStrings:dbname")) 
 
   let loginUser (request: UserRequest) (dbClient: IMongoDatabase) = 
-    let collection = dbClient.GetCollection<UserRequest>("Users")
-    let filter = Builders.Filter.Eq((fun doc -> doc.Password), request.Password)
-
+    let collection = dbClient.GetCollection<UserDetails>("Users")
+    
+    // TODO: Finish JWT authentication; Below is an example of how to use filters for mongo
+    //let passwordFilter = Builders.Filter.Eq((fun doc -> doc.Password), request.Password)
+    let usernameFilter = Builders.Filter.Eq((fun doc -> doc.Email), request.Email)
+    //let filter = Builders.Filter.And(passwordFilter, usernameFilter)
     // Return collections to avoid leaking nulls into your program from C#.
-    collection.Find(filter).ToList() |> Seq.first
+    collection.Find(usernameFilter).ToList() |> Seq.first
     
     
