@@ -37,9 +37,23 @@ module DB =
                                   BsonElement("_id" , BsonObjectId(ObjectId.GenerateNewId()) );
                                   BsonElement("user", details)
                                 ])
-    let collection = dbClient.GetCollection<BsonDocument> "Users"
+    let collection = dbClient.GetCollection<BsonDocument>("Users")
     collection.InsertOne bsonUser
     request
+
+  let getCurrentUser (dbClient: IMongoDatabase) request = 
+    // TODO: Create handle to grab the current user
+    None
+
+  let updateRequestedUser (dbClient : IMongoDatabase) (request : UserDetails) = 
+    let collection = dbClient.GetCollection<User> "Users"
+    
+    let requestedUser = Builders.Filter.Eq((fun doc -> doc.User.Email), request.Email)
+    let updateUser = Builders.Update.Set((fun doc -> doc.User.Bio), request.Bio)
+                                    .Set((fun doc -> doc.User.Image), request.Image)
+                                    .Set((fun doc -> doc.User.Username), request.Username)
+               
+    Some (collection.UpdateOne(requestedUser, updateUser))
     
   let registerNewUser (dbClient:IMongoDatabase) (request: UserRequest) = 
     // TODO: Create hash for password

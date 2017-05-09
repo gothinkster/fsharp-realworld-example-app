@@ -129,3 +129,15 @@ namespace RealWorld
       [<field : DataMember(Name = "tags")>]
       Tags : string array;
     }
+
+    [<DataContract>]
+    type ErrorBody = {
+      [<field : DataMember(Name = "body")>]
+      Body : string array;
+    }
+
+    [<DataContract>]
+    type ErrorReport = {
+      [<field : DataMember(Name = "error")>]
+      Errors : ErrorBody;
+    }
