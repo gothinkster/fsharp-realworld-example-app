@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="lib/Models.fs" />
+    <Compile Include="lib/Convert.fs" />
     <Compile Include="lib/Effects.fs" />
     <Compile Include="lib/Stubs.fs" />
     <Compile Include="Program.fs" />

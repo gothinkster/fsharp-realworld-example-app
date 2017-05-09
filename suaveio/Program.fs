@@ -8,24 +8,53 @@ open System.IO
 open Microsoft.Extensions.Configuration
 open MongoDB.Driver
 open RealWorld.Models
+open RealWorld.Effects.DB
+open MongoDB.Bson
 
 let serverConfig = 
-  { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8072] }
+  { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8073] }
 
-let exampleGrabRequestJson () = 
+let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
+let fakeReply email = 
+  {User = { Email = email; Token = ""; Username=""; Bio=""; Image=""; PasswordHash=""; }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
+
+let validateCredentials dbClient = 
   request (fun inputGraph -> 
-    // This is how you get the requesting json from the ajax request
-    printfn "%A" (Suave.Json.fromJson<UserRequest> inputGraph.rawForm)
+    let user = Suave.Json.fromJson<UserRequest> inputGraph.rawForm |> loginUser dbClient
     Successful.OK (sprintf "%A" inputGraph)
   )
+
+let registerUserNewUser dbClient = 
+  request ( fun inputGraph -> 
+    Suave.Json.fromJson<UserRequest> inputGraph.rawForm
+    |> registerWithBson dbClient 
+    |> Realworld.Convert.userRequestToUser 
+    |> jsonToString 
+    |> Successful.OK
+  )
+    
+let getCurrentUser dbClient =
+  request (fun inputGraph ->
+    Successful.OK (fakeReply "" |> jsonToString)
+  )
+
+let updateUser dbClient = 
+  request (fun inputGraph ->
+    let userToUpdate = (Suave.Json.fromJson<User> inputGraph.rawForm).User
+
+    userToUpdate
+    |> updateRequestedUser dbClient
+    |> Realworld.Convert.updateUser userToUpdate
+    |> Successful.OK
+  )
   
-// TODO: Replace each return comments with function to carry out the action.
-let app dbClient = 
+//TODO: Replace each return comments with function to carry out the action.
+let app (dbClient: IMongoDatabase) = 
   choose [
-    POST >=> path "/users/login" >=> exampleGrabRequestJson ()
-    POST >=> path "/users" >=> (Successful.OK Responses.usersLogin)
-    GET  >=> path "/user" >=> (Successful.OK Responses.usersLogin)
-    PUT  >=> path "/user" >=> (Successful.OK Responses.usersLogin)
+    POST >=> path "/users/login" >=> validateCredentials dbClient
+    POST >=> path "/users" >=> registerUserNewUser dbClient
+    GET  >=> path "/user" >=> getCurrentUser dbClient
+    PUT  >=> path "/user" >=> updateUser dbClient
     GET  >=> path "/profile/:username" >=> (Successful.OK Responses.singleProfile) 
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)

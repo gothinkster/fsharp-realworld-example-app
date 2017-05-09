@@ -2,15 +2,22 @@ namespace RealWorld
 
   module Models =
     open System.Runtime.Serialization
+    open MongoDB.Bson
 
     [<DataContract>]
-    type UserRequest = {
+    type UserRequestDetails = {
       [<field : DataMember(Name = "username")>]
       Username : string;
       [<field : DataMember(Name = "email")>]
       Email : string;
       [<field : DataMember(Name = "password")>]
       Password : string;
+    }
+
+    [<DataContract>]
+    type UserRequest = {
+      [<field: DataMember(Name = "user")>]
+      User : UserRequestDetails;
     }
     
     [<DataContract>]
@@ -25,12 +32,14 @@ namespace RealWorld
       Bio : string;
       [<field : DataMember(Name = "image")>]
       Image : string;
+      PasswordHash : string;
     }
 
     [<DataContract>]
     type User = {
       [<field : DataMember(Name = "user")>]
       User : UserDetails;
+      Id : BsonObjectId
     }
 
     [<DataContract>]

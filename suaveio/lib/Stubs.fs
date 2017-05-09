@@ -8,17 +8,6 @@ open RealWorld.Models
   They are here as canned response so front end development can be done if need be.
 *)
 module Responses =
-  let usersLogin = 
-    { 
-        User = {
-                  Email = "test@gmail.com";
-                  Token = "some_fake_token";
-                  Username = "test";
-                  Bio = "This is a test bio";
-                  Image = "";
-        }
-    } |> toJson |> System.Text.Encoding.UTF8.GetString
-
   let singleProfile = 
     {
       Profile = {
