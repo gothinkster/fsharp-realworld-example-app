@@ -34,3 +34,7 @@ module Actions =
       |> Realworld.Convert.updateUser userToUpdate
       |> Successful.OK
     )
+
+  open RealWorld.Stubs
+  let getUserProfile dbClient username = 
+    (Successful.OK Responses.singleProfile)

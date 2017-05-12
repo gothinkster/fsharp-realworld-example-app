@@ -28,7 +28,7 @@ let app (dbClient: IMongoDatabase) =
     POST >=> path "/users" >=> registerUserNewUser dbClient
     GET  >=> path "/user" >=> getCurrentUser dbClient
     PUT  >=> path "/user" >=> updateUser dbClient
-    GET  >=> path "/profile/:username" >=> (Successful.OK Responses.singleProfile) 
+    GET  >=> pathScan "/profile/%s" (fun username -> getUserProfile dbClient username)
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     GET  >=> path "/articles" >=> (Successful.OK Responses.multipleArticles)
