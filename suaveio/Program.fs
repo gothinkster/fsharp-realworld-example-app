@@ -9,14 +9,11 @@ open Microsoft.Extensions.Configuration
 open MongoDB.Driver
 open RealWorld.Models
 open RealWorld.Effects.DB
+open RealWorld.Effects.Actions
 open MongoDB.Bson
 
 let serverConfig = 
   { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8073] }
-
-let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
-let fakeReply email = 
-  {User = { Email = email; Token = ""; Username=""; Bio=""; Image=""; PasswordHash=""; }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
 
 let validateCredentials dbClient = 
   request (fun inputGraph -> 
@@ -24,30 +21,6 @@ let validateCredentials dbClient =
     Successful.OK (sprintf "%A" inputGraph)
   )
 
-let registerUserNewUser dbClient = 
-  request ( fun inputGraph -> 
-    Suave.Json.fromJson<UserRequest> inputGraph.rawForm
-    |> registerWithBson dbClient 
-    |> Realworld.Convert.userRequestToUser 
-    |> jsonToString 
-    |> Successful.OK
-  )
-    
-let getCurrentUser dbClient =
-  request (fun inputGraph ->
-    Successful.OK (fakeReply "" |> jsonToString)
-  )
-
-let updateUser dbClient = 
-  request (fun inputGraph ->
-    let userToUpdate = (Suave.Json.fromJson<User> inputGraph.rawForm).User
-
-    userToUpdate
-    |> updateRequestedUser dbClient
-    |> Realworld.Convert.updateUser userToUpdate
-    |> Successful.OK
-  )
-  
 //TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
   choose [
