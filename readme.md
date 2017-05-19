@@ -12,7 +12,7 @@
 
 # How it works
 
-> Describe the general architecture of your app here
+> The Suave application in divided up into 2 sectors, pure functions and effectsfull functions. All of the effectful functions are contained in the effects namespaces. THe functions in this namespace are in charge are communicating with the database. 
 
 # Getting started
 
