@@ -12,9 +12,10 @@
 
 # How it works
 
-> The Suave application in divided up into 2 sectors, pure functions and effectsfull functions. All of the effectful functions are contained in the effects namespaces. THe functions in this namespace are in charge are communicating with the database. 
+> The Suave/Aspnet applications are divided up into 2 sectors, pure functions and "effectful" functions. All of the "effectful" functions are contained in the effects namespace. These functions in this namespace are in charge are communicating with the database. 
 
 # Getting started
 
-> npm install, npm start, etc.
+> Prerequisites: 
+* See installation section.
 
