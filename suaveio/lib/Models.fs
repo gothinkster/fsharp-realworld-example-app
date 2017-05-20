@@ -141,3 +141,11 @@ namespace RealWorld
       [<field : DataMember(Name = "error")>]
       Errors : ErrorBody;
     }
+
+    type ArticleOptions = {
+      Limit : int;
+      Tag : string;
+      Author : string;
+      Favorited : string;
+      Offset : int;
+    }

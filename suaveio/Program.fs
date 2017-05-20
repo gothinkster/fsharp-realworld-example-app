@@ -21,6 +21,28 @@ let validateCredentials dbClient =
     Successful.OK (sprintf "%A" inputGraph)
   )
 
+let extractStringQueryVal (queryParameters : HttpRequest) name =
+  match queryParameters.queryParam name with
+  | Choice1Of2 queryVal -> queryVal
+  | Choice2Of2 _ -> String.Empty
+
+let extractNumericQueryVal (queryParameters : HttpRequest) name =
+  match queryParameters.queryParam name with
+  | Choice1Of2 limit -> Convert.ToInt32 limit
+  | Choice2Of2 _ -> 0
+  
+let routeByOptions (queryParameters : HttpRequest) =
+  let listArticleOptions = {
+    Limit = extractNumericQueryVal queryParameters "limit";
+    Tag = extractStringQueryVal queryParameters "tag";
+    Author = extractStringQueryVal queryParameters "author";
+    Favorited = extractStringQueryVal queryParameters "favorited";
+    Offset = extractNumericQueryVal queryParameters "offset";
+  } 
+
+  // TODO: pass the options to mongo to filter properly
+  (Successful.OK Responses.multipleArticles)
+
 //TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
   choose [
@@ -29,9 +51,10 @@ let app (dbClient: IMongoDatabase) =
     GET  >=> path "/user" >=> getCurrentUser dbClient
     PUT  >=> path "/user" >=> updateUser dbClient
     GET  >=> pathScan "/profile/%s" (fun username -> getUserProfile dbClient username)
+    // Come back to these when authentication gets implemented because it's needed to follow a user by their username
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
-    GET  >=> path "/articles" >=> (Successful.OK Responses.multipleArticles)
+    GET  >=> path "/articles" >=> request (fun articleRequest -> routeByOptions articleRequest)
     GET  >=> path "/articles/feed" >=> (Successful.OK Responses.multipleArticles)
     GET  >=> path "/articles/:slug" >=> (Successful.OK Responses.singleArticle)
     PUT  >=> path "/articles/:slug" >=> (Successful.OK Responses.singleArticle)
