@@ -14,6 +14,9 @@ module DB =
     let builder = ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json")
     builder.Build()
 
+  let getArticleViaOptions options = 
+    ()
+
   let getDBClient () = 
     let mongoConn : string = getConfigDbConnection.GetValue("ConnectionStrings:DefaultConnection")
     let client = new MongoClient(mongoConn)
