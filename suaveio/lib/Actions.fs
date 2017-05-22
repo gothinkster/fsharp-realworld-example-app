@@ -38,3 +38,7 @@ module Actions =
   open RealWorld.Stubs
   let getUserProfile dbClient username = 
     (Successful.OK Responses.singleProfile)
+
+  let createNewArticle (articleToAdd : Article) = 
+    let tagQueryFragment articleToAdd = ()
+    Responses.singleArticle

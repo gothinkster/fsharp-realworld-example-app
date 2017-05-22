@@ -16,7 +16,7 @@ module DB =
 
   let getArticleViaOptions options = 
     ()
-
+    
   let getDBClient () = 
     let mongoConn : string = getConfigDbConnection.GetValue("ConnectionStrings:DefaultConnection")
     let client = new MongoClient(mongoConn)

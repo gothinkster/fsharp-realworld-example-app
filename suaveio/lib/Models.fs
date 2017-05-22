@@ -81,6 +81,8 @@ namespace RealWorld
       FavoritesCount : uint32;
       [<field : DataMember(Name = "author")>]
       Author : ProfileDetails;
+      [<field : DataMember(Name = "tagList")>]
+      Taglist : string array
     }
 
     [<DataContract>]

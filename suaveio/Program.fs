@@ -3,6 +3,7 @@ open Suave
 open Suave.Http
 open Suave.Operators
 open Suave.Filters
+open Suave.Json
 open RealWorld.Stubs
 open System.IO
 open Microsoft.Extensions.Configuration
@@ -41,7 +42,13 @@ let routeByOptions (queryParameters : HttpRequest) =
   } 
 
   // TODO: pass the options to mongo to filter properly
-  (Successful.OK Responses.multipleArticles)
+  (Successful.OK "successful")
+
+let initProfile = 
+  {Username = ""; Bio = ""; Image = ""; Following = false;}
+
+let mapJsonToArticle (article : Article) = 
+  createNewArticle article
 
 //TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
@@ -54,7 +61,7 @@ let app (dbClient: IMongoDatabase) =
     // Come back to these when authentication gets implemented because it's needed to follow a user by their username
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
-    GET  >=> path "/articles" >=> request (fun articleRequest -> routeByOptions articleRequest)
+    GET  >=> path "/articles" >=> (Successful.OK Responses.singleProfile)
     GET  >=> path "/articles/feed" >=> (Successful.OK Responses.multipleArticles)
     GET  >=> path "/articles/:slug" >=> (Successful.OK Responses.singleArticle)
     PUT  >=> path "/articles/:slug" >=> (Successful.OK Responses.singleArticle)
@@ -64,7 +71,7 @@ let app (dbClient: IMongoDatabase) =
     DELETE >=> path "/articles/:slug/comments/:id" >=> (Successful.OK Responses.multipleComments)
     POST >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
     DELETE >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
-    POST >=> path "/articles" >=> (Successful.OK Responses.singleArticle) // Creates a new article
+    POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle)) // Creates a new article
     GET >=> path "/tags" >=> (Successful.OK Responses.tagList)
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
