@@ -39,6 +39,6 @@ module Actions =
   let getUserProfile dbClient username = 
     (Successful.OK Responses.singleProfile)
 
-  let createNewArticle (articleToAdd : Article) = 
-    let tagQueryFragment articleToAdd = ()
+  let createNewArticle (articleToAdd : Article) dbCLient = 
+    
     Responses.singleArticle

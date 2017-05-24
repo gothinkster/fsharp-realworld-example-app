@@ -9,18 +9,39 @@ module DB =
   open MongoDB.Driver.Linq
 
   // TODO: Convert side effects to return option types
+  let currentDir = Directory.GetCurrentDirectory()
 
-  let getConfigDbConnection = 
-    let builder = ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json")
+  let getConfigDbConnection currentDir = 
+    let builder = ConfigurationBuilder().SetBasePath(currentDir).AddJsonFile("appsettings.json")
     builder.Build()
-
+    
   let getArticleViaOptions options = 
     ()
-    
+
+  let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 
+    let articleDetails = BsonDocument([
+                                        BsonElement("slug", BsonValue.Create article.Article.Slug);
+                                        BsonElement("title", BsonValue.Create article.Article.Title);
+                                        BsonElement("description", BsonValue.Create article.Article.Description);
+                                        BsonElement("body", BsonValue.Create article.Article.Body);
+                                        BsonElement("createdat", BsonValue.Create article.Article.CreatedAt);
+                                        BsonElement("updateat", BsonValue.Create article.Article.UpdatedAt);
+                                        BsonElement("favorited", BsonValue.Create article.Article.Favorited);
+                                        BsonElement("favoritesCount", BsonValue.Create article.Article.FavoritesCount);
+                                        BsonElement("author", BsonValue.Create article.Article.Author);
+                                        BsonElement("tagList", BsonValue.Create article.Article.Taglist);
+                                      ])
+    let bsonArticle = BsonDocument([
+                                      BsonElement("article", BsonValue.Create articleDetails)
+                                  ])
+
+    let collection = dbClient.GetCollection<BsonDocument> "Articles"
+    collection.InsertOne(bsonArticle)
+    ()
   let getDBClient () = 
-    let mongoConn : string = getConfigDbConnection.GetValue("ConnectionStrings:DefaultConnection")
+    let mongoConn : string = (currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:DefaultConnection")
     let client = new MongoClient(mongoConn)
-    client.GetDatabase(getConfigDbConnection.GetValue("ConnectionStrings:dbname"))
+    client.GetDatabase((currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:dbname"))
 
   (* 
     If we save docs using bson documents we won't have to create a separate record that can be passed around 

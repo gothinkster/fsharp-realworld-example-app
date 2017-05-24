@@ -47,8 +47,8 @@ let routeByOptions (queryParameters : HttpRequest) =
 let initProfile = 
   {Username = ""; Bio = ""; Image = ""; Following = false;}
 
-let mapJsonToArticle (article : Article) = 
-  createNewArticle article
+let mapJsonToArticle (article : Article) dbClient = 
+  createNewArticle article dbClient
 
 //TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
@@ -71,7 +71,7 @@ let app (dbClient: IMongoDatabase) =
     DELETE >=> path "/articles/:slug/comments/:id" >=> (Successful.OK Responses.multipleComments)
     POST >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
     DELETE >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
-    POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle)) // Creates a new article
+    POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle dbClient)) // Creates a new article
     GET >=> path "/tags" >=> (Successful.OK Responses.tagList)
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
