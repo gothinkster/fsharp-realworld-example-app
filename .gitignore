@@ -3,7 +3,6 @@
 # dependencies
 /node_modules
 /bower_components
-/packages
 
 # IDEs and editors
 /.idea
@@ -21,3 +20,5 @@ backend/suaveio/bin
 suaveio/bin
 suaveio/obj
 .vscode
+
+suaveio/packages/
