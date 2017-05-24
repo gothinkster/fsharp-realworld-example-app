@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /bower_components
+/packages
 
 # IDEs and editors
 /.idea
