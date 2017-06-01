@@ -14,7 +14,7 @@ open RealWorld.Effects.Actions
 open MongoDB.Bson
 
 let serverConfig = 
-  { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8073] }
+  { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8072] }
 
 let validateCredentials dbClient = 
   request (fun inputGraph -> 

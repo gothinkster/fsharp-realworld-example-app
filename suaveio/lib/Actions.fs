@@ -40,5 +40,7 @@ module Actions =
     (Successful.OK Responses.singleProfile)
 
   let createNewArticle (articleToAdd : Article) dbCLient = 
+    // TODO: add success response
+    let succesful = insertNewArticle articleToAdd dbCLient
+    articleToAdd 
     
-    Responses.singleArticle

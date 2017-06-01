@@ -22,14 +22,14 @@ module DB =
     let articleDetails = BsonDocument([
                                         BsonElement("slug", BsonValue.Create article.Article.Slug);
                                         BsonElement("title", BsonValue.Create article.Article.Title);
-                                        BsonElement("description", BsonValue.Create article.Article.Description);
-                                        BsonElement("body", BsonValue.Create article.Article.Body);
-                                        BsonElement("createdat", BsonValue.Create article.Article.CreatedAt);
-                                        BsonElement("updateat", BsonValue.Create article.Article.UpdatedAt);
-                                        BsonElement("favorited", BsonValue.Create article.Article.Favorited);
-                                        BsonElement("favoritesCount", BsonValue.Create article.Article.FavoritesCount);
-                                        BsonElement("author", BsonValue.Create article.Article.Author);
-                                        BsonElement("tagList", BsonValue.Create article.Article.Taglist);
+                                        BsonElement("description", BsonValue.Create "");
+                                        BsonElement("body", BsonValue.Create "");
+                                        BsonElement("createdat", BsonValue.Create "");
+                                        BsonElement("updateat", BsonValue.Create "");
+                                        BsonElement("favorited", BsonValue.Create "");
+                                        BsonElement("favoritesCount", BsonValue.Create 0);
+                                        BsonElement("author", BsonValue.Create "");
+                                        BsonElement("tagList", BsonValue.Create [||]);
                                       ])
     let bsonArticle = BsonDocument([
                                       BsonElement("article", BsonValue.Create articleDetails)
@@ -37,7 +37,8 @@ module DB =
 
     let collection = dbClient.GetCollection<BsonDocument> "Articles"
     collection.InsertOne(bsonArticle)
-    ()
+    article
+
   let getDBClient () = 
     let mongoConn : string = (currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:DefaultConnection")
     let client = new MongoClient(mongoConn)
