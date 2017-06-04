@@ -19,6 +19,8 @@ backend/suaveio/obj
 backend/suaveio/bin
 suaveio/bin
 suaveio/obj
+suaveio/tests/obj
+suaveio/tests/bin
 .vscode
 
 suaveio/packages/
