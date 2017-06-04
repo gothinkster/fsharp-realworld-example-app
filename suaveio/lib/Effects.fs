@@ -107,6 +107,7 @@ module DB =
     // Return collections to avoid leaking nulls into your program from C#.
     collection.Find(usernameFilter).ToList() |> Seq.first
 
-
-    
-    
+  let getArticleBySlug (dbClient: IMongoDatabase) slug = 
+    let collection = dbClient.GetCollection<Article>("Article")
+    let articleFilter = Builders.Filter.Eq((fun article -> article.Article.Slug), slug)
+    collection.Find(articleFilter).ToList() |> Seq.first

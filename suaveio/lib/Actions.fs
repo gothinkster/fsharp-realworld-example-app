@@ -43,4 +43,8 @@ module Actions =
     // TODO: add success response
     let succesful = insertNewArticle articleToAdd dbCLient
     articleToAdd 
-    
+
+  let getArticlesBy slug dbClient =
+    getArticleBySlug dbClient slug
+    |> jsonToString
+    |> Successful.OK

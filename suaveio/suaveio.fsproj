@@ -9,7 +9,6 @@
     <Compile Include="lib/Effects.fs" />
     <Compile Include="lib/Stubs.fs" />
     <Compile Include="lib/Actions.fs" />
-    <Compile Include="tests/IntgrationTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
