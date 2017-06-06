@@ -45,6 +45,8 @@ module Actions =
     articleToAdd 
 
   let getArticlesBy slug dbClient =
+    (* TODO: Add suave testing for this. *)
     getArticleBySlug dbClient slug
+    |> Realworld.Convert.extractArticleList
     |> jsonToString
     |> Successful.OK

@@ -21,6 +21,7 @@ suaveio/bin
 suaveio/obj
 suaveio/tests/obj
 suaveio/tests/bin
+suaveio/tests/packages
 .vscode
 
 suaveio/packages/

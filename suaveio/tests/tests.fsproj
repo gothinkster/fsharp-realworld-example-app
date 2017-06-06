@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SuaveTesting.fs" />
     <Compile Include="Integration.fs" />
     <Compile Include="Sample.fs" />
     <Compile Include="Main.fs" />
@@ -15,6 +16,10 @@
     <PackageReference Include="FSharp.Core" Version="4.1.*" />
     <PackageReference Include="FSharp.NET.Sdk" Version="1.0.*" PrivateAssets="All" />
     <PackageReference Include="Expecto" Version="5.0.0-*" />
+    <PackageReference Include="Suave" Version="2.1.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.4.3" />
+    <ProjectReference Include="../suaveio.fsproj" />
+    <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

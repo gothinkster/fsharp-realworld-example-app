@@ -3,4 +3,5 @@ open Expecto
 
 [<EntryPoint>]
 let main argv =
-    Tests.runTestsInAssembly defaultConfig argv
+  (* TODO: Add unit tests an they are written *)
+  runTests defaultConfig Integration.tests

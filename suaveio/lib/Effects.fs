@@ -68,6 +68,7 @@ module DB =
 
   let getCurrentUser (dbClient: IMongoDatabase) request = 
     // TODO: Create handle to grab the current user
+    (* TODO: Implement after adding the authentication lib *)
     None
 
   let updateRequestedUser (dbClient : IMongoDatabase) (request : UserDetails) = 
