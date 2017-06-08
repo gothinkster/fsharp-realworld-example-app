@@ -9,15 +9,6 @@ open Testing
 open Suave
 open Suave.Web
 
-(*
-  let GetRequest u =
-    let uri = new System.Uri("http://some.random.tld" + u)
-    let rawQuery = uri.Query.TrimStart('?')
-    let req = { HttpRequest.empty with url = uri ;
-                ``method`` = HttpMethod.GET ;
-                rawQuery = rawQuery }
-    { HttpContext.empty with request = req }
-*)
 let runWithDefaultConfig = runWith defaultConfig
 
 let databaseClient =
@@ -40,7 +31,16 @@ let tests =
       Expect.equal true true "This string option from db"
 
     testCase "Should return fake current user" <| fun _ -> 
-      // use data = new System.Net.Http.StringContent(sampleDocJson)
+      (*
+        Example of sending a json doc to the api endpoint:
+        
+        let sampleDoc = { id = System.Guid(validId); body = "Text" }
+        let sampleDocJson = sampleDoc |> toJson
+
+        use data = new System.Net.Http.StringContent(sampleDocJson)
+        let result = runWithDefaultConfig (Program.app databaseClient) |> req HttpMethod.GET "/user" (Some data)
+      *)
+      
       let result = runWithDefaultConfig (Program.app databaseClient) |> req HttpMethod.GET "/user" None
       printfn "Request made to get the current user: %A" result   
       Expect.equal true true "this will hit the real endpoint"
