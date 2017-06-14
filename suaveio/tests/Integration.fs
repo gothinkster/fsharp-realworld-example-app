@@ -8,6 +8,8 @@ open MongoDB.Driver.Linq
 open Testing
 open Suave
 open Suave.Web
+open RealWorld.Models
+open System
 
 let runWithDefaultConfig = runWith defaultConfig
 
@@ -16,6 +18,16 @@ let databaseClient =
   let client = new MongoClient(mongoConn)
   client.GetDatabase("realworld")
 
+(*
+  Example of sending a json doc to the api endpoint:
+  
+  let sampleDoc = { id = System.Guid(validId); body = "Text" }
+  let sampleDocJson = sampleDoc |> toJson
+
+  use data = new System.Net.Http.StringContent(sampleDocJson)
+  let result = runWithDefaultConfig (Program.app databaseClient) |> req HttpMethod.GET "/user" (Some data)
+*)
+
 [<Tests>]
 let tests = 
   testList "Articles" [
@@ -23,25 +35,12 @@ let tests =
       let result = getArticleBySlug databaseClient "this slug will not be in the db"
       Expect.equal result None "Did not return None from database"
 
-    testCase "should blow up in your face" <| fun _ ->
-      let result = RealWorld.Effects.Actions.getArticlesBy "something that's not there" databaseClient
-      // TODO: Use suave testing for the correct response
-      printfn "Get articles result: %A" result
-
-      Expect.equal true true "This string option from db"
-
     testCase "Should return fake current user" <| fun _ -> 
-      (*
-        Example of sending a json doc to the api endpoint:
-        
-        let sampleDoc = { id = System.Guid(validId); body = "Text" }
-        let sampleDocJson = sampleDoc |> toJson
-
-        use data = new System.Net.Http.StringContent(sampleDocJson)
-        let result = runWithDefaultConfig (Program.app databaseClient) |> req HttpMethod.GET "/user" (Some data)
-      *)
-      
       let result = runWithDefaultConfig (Program.app databaseClient) |> req HttpMethod.GET "/user" None
-      printfn "Request made to get the current user: %A" result   
-      Expect.equal true true "this will hit the real endpoint"
+      let user = Json.fromJson<UserRequest> (System.Text.Encoding.Unicode.GetBytes result)
+       
+      Expect.equal user.User.Username String.Empty "The user name is not matching."
+
+    testCase "Should add a new article" <| fun _ -> 
+      Expect.equal true true "Stub for adding new article"
   ]
