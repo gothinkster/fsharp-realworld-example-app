@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="SuaveTesting.fs" />
+    <Compile Include="Utils.fs" />
     <Compile Include="Integration.fs" />
     <Compile Include="Sample.fs" />
     <Compile Include="Main.fs" />
