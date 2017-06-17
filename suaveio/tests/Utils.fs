@@ -12,15 +12,29 @@ namespace Helper
         let req = { httpCtx.request with url = uri; rawQuery = rawQuery;  }
         { httpCtx with request = req }
 
+    let withUriForPost url json httpCtx =
+      let uri = new System.Uri("http://some.phony.url" + url)      
+      let req = { httpCtx.request with url = uri; rawForm = json;  }
+      { httpCtx with request = req }
+
     let asGetRequest hc =
         let req = { hc.request with ``method`` = HttpMethod.GET }
         { hc with request = req }
 
+    let asPostRequest hc =
+      let req = {hc.request with ``method`` = HttpMethod.POST }
+      { hc with request = req }
+
     let GetRequest u =
         HttpContext.empty
         |> withUri u
-        |> asGetRequest
-
+        |> asGetRequest   
+      
+    let getPostRequest url json =
+      HttpContext.empty
+      |> withUriForPost url json
+      |> asPostRequest
+    
     let databaseClient =
       let mongoConn : string = "mongodb://localhost:27017"
       let client = new MongoClient(mongoConn)
