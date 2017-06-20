@@ -4,6 +4,7 @@
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
         <Target Name="_Inspect_FscArgs"
+          Condition=" '$(IsCrossTargetingBuild)' != 'true' "
           DependsOnTargets="ResolveReferences;CoreCompile">
     <Message Text="%(FscCommandLineArgs.Identity)" Importance="High" />
     <WriteLinesToFile
@@ -18,18 +19,21 @@
         Files="$(_Inspect_FscArgs_OutFile)"
         AlwaysCreate="True" />
   </Target>
-<Target Name="_Inspect_GetProjectReferences">
-    <Message Text="%(ProjectReference.FullPath)" Importance="High" />
+<Target Name="_Inspect_GetResolvedProjectReferences"
+          Condition=" '$(IsCrossTargetingBuild)' != 'true' "
+          DependsOnTargets="ResolveProjectReferencesDesignTime">
+    <Message Text="%(_MSBuildProjectReferenceExistent.FullPath)" Importance="High" />
+    <Message Text="%(_MSBuildProjectReferenceExistent.SetTargetFramework)" Importance="High" />
     <WriteLinesToFile
-            Condition=" '$(_Inspect_GetProjectReferences_OutFile)' != '' "
-            File="$(_Inspect_GetProjectReferences_OutFile)"
-            Lines="@(ProjectReference -> '%(FullPath)')"
+            Condition=" '$(_Inspect_GetResolvedProjectReferences_OutFile)' != '' "
+            File="$(_Inspect_GetResolvedProjectReferences_OutFile)"
+            Lines="@(_MSBuildProjectReferenceExistent -> 'ProjectReferenceFullPath=%(FullPath);%(SetTargetFramework)')"
             Overwrite="true"
             Encoding="UTF-8"/>
-    <!-- WriteLinesToFile doesnt create the file if @(ProjectReference) is empty -->
+    <!-- WriteLinesToFile doesnt create the file if @(_MSBuildProjectReferenceExistent) is empty -->
     <Touch
-        Condition=" '$(_Inspect_GetProjectReferences_OutFile)' != '' "
-        Files="$(_Inspect_GetProjectReferences_OutFile)"
+        Condition=" '$(_Inspect_GetResolvedProjectReferences_OutFile)' != '' "
+        Files="$(_Inspect_GetResolvedProjectReferences_OutFile)"
         AlwaysCreate="True" />
   </Target>
 
@@ -40,6 +44,16 @@
         <_Inspect_GetProperties_OutLines Include="P0">
             <PropertyName>TargetPath</PropertyName>
             <PropertyValue>$(TargetPath)</PropertyValue>
+        </_Inspect_GetProperties_OutLines>
+
+        <_Inspect_GetProperties_OutLines Include="P1">
+            <PropertyName>IsCrossTargetingBuild</PropertyName>
+            <PropertyValue>$(IsCrossTargetingBuild)</PropertyValue>
+        </_Inspect_GetProperties_OutLines>
+
+        <_Inspect_GetProperties_OutLines Include="P2">
+            <PropertyName>TargetFrameworks</PropertyName>
+            <PropertyValue>$(TargetFrameworks)</PropertyValue>
         </_Inspect_GetProperties_OutLines></ItemGroup>
     <Message Text="%(_Inspect_GetProperties_OutLines.PropertyName)=%(_Inspect_GetProperties_OutLines.PropertyValue)" Importance="High" />
     <WriteLinesToFile

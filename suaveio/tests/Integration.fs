@@ -55,7 +55,17 @@ let tests =
                       Taglist = [||];
         }
       }
-      //let result = suaveContext |> req HttpMethod.POST "/articles" (Some inputData)
+      
+      let jsonArticle = Suave.Json.toJson sampleArticle 
+      let routeResponse = 
+        getPostRequest "/articles" jsonArticle
+        |> Program.app databaseClient 
+        |> extractContext
 
-      Expect.equal true true "Stub for adding new article"
+      let savedArticle = 
+        routeResponse.response.content 
+        |> getContent 
+        |> Suave.Json.fromJson<Article>
+
+      Expect.equal savedArticle.Article.Title "Anothe test" "Did return the same article"
   ]

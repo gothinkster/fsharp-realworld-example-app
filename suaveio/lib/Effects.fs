@@ -36,7 +36,7 @@ module DB =
                                   ])
 
     let collection = dbClient.GetCollection<BsonDocument> "Articles"
-    collection.InsertOne(bsonArticle)
+    collection.InsertOne(bsonArticle)    
     article
 
   let getDBClient () = 

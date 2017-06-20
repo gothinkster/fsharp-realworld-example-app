@@ -7,10 +7,10 @@ namespace Helper
     open Suave.Web
 
     let withUri url httpCtx =
-        let uri = new System.Uri("http://some.phony.url" + url)
-        let rawQuery = uri.Query.TrimStart('?')
-        let req = { httpCtx.request with url = uri; rawQuery = rawQuery;  }
-        { httpCtx with request = req }
+      let uri = new System.Uri("http://some.phony.url" + url)
+      let rawQuery = uri.Query.TrimStart('?')
+      let req = { httpCtx.request with url = uri; rawQuery = rawQuery;  }
+      { httpCtx with request = req }
 
     let withUriForPost url json httpCtx =
       let uri = new System.Uri("http://some.phony.url" + url)      
@@ -18,17 +18,17 @@ namespace Helper
       { httpCtx with request = req }
 
     let asGetRequest hc =
-        let req = { hc.request with ``method`` = HttpMethod.GET }
-        { hc with request = req }
+      let req = { hc.request with ``method`` = HttpMethod.GET }
+      { hc with request = req }
 
     let asPostRequest hc =
       let req = {hc.request with ``method`` = HttpMethod.POST }
       { hc with request = req }
 
     let GetRequest u =
-        HttpContext.empty
-        |> withUri u
-        |> asGetRequest   
+      HttpContext.empty
+      |> withUri u
+      |> asGetRequest   
       
     let getPostRequest url json =
       HttpContext.empty
@@ -47,7 +47,6 @@ namespace Helper
     let extractContext ctx =
       ctx |> Async.RunSynchronously |> possibleResult
 
-    let getContent content = 
-      match content with
+    let getContent  = function
       | Bytes a -> a
       | _ -> failwith "Didn't return string content."
