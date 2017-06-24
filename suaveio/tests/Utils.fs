@@ -18,7 +18,7 @@ namespace Helper
       { httpCtx with request = req }
 
     let asGetRequest hc =
-      let req = { hc.request with ``method`` = HttpMethod.GET }
+      let req = { hc.request with ``method`` = HttpMethod.GET;  }
       { hc with request = req }
 
     let asPostRequest hc =
