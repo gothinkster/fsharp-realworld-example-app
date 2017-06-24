@@ -1,15 +1,22 @@
 ﻿<Project Sdk="FSharp.NET.Sdk;Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp1.1.2</TargetFramework>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+    <ThreadPoolMinThreads>8</ThreadPoolMinThreads>
   </PropertyGroup>
   <ItemGroup>
+    
     <Compile Include="lib/Models.fs" />
     <Compile Include="lib/Convert.fs" />
     <Compile Include="lib/Effects.fs" />
     <Compile Include="lib/Stubs.fs" />
     <Compile Include="lib/Actions.fs" />
     <Compile Include="Program.fs" />
+    
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.1.*" />
