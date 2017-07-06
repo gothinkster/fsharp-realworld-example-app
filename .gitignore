@@ -17,6 +17,8 @@
 Thumbs.db
 backend/suaveio/obj
 backend/suaveio/bin
+suaveio/src/RealWorld/obj
+suaveio/src/RealWorld/bin
 suaveio/bin
 suaveio/obj
 suaveio/tests/obj

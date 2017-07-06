@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp1.1.2</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
@@ -11,12 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    
     <Compile Include="Utils.fs" />
     <Compile Include="Integration.fs" />
     <Compile Include="Sample.fs" />
-    <Compile Include="Main.fs" />
-    
+    <Compile Include="Main.fs" />    
   </ItemGroup>
 
   <ItemGroup>
