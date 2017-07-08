@@ -51,7 +51,7 @@ let mapJsonToArticle (article : Article) dbClient =
   createNewArticle article dbClient
 
 let confirmCall () =
-  printfn "Getting called."
+  (* TODO: Complete getting the article by it's slug *)
   Successful.OK Responses.singleArticle
 
 //TODO: Replace each return comments with function to carry out the action.
@@ -76,7 +76,7 @@ let app (dbClient: IMongoDatabase) =
     POST >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
     DELETE >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
     POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle dbClient)) // Creates a new article
-    GET >=> path "/tags" >=> (Successful.OK Responses.tagList)
+    GET >=> path "/tags" >=> getTagList dbClient
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
 

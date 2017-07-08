@@ -97,4 +97,8 @@ let tests =
       let article = routeResponse.response.content |> getContent |> Suave.Json.fromJson<Article>
 
       Expect.equal article.Article.Title "This is a new test title" "Title did not match."
+
+    testCase "Should return empty taglist from the database" <| fun _ -> 
+      (* Add test case for getting the taglist *)
+      Expect.equal true true "this failed to return an empty list"
   ]

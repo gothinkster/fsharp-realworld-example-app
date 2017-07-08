@@ -50,3 +50,14 @@ module Actions =
     |> Realworld.Convert.extractArticleList
     |> jsonToString
     |> Successful.OK
+
+  let defaultTagsIfEmpty = function
+    | Some tags -> tags
+    | None -> { Tags = [||] }
+
+  let getTagList dbClient =
+    getSavedTagList dbClient 
+    |> defaultTagsIfEmpty
+    |> jsonToString
+    |> Successful.OK 
+    

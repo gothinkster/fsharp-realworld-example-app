@@ -15,6 +15,11 @@ module DB =
     let builder = ConfigurationBuilder().SetBasePath(currentDir).AddJsonFile("appsettings.json")
     builder.Build()
     
+  let getSavedTagList (dbClient : IMongoDatabase) =
+    let collection = dbClient.GetCollection<TagCloud>("Tags")
+    let numberOfTagDocs = collection.AsQueryable().ToList().Count
+    if numberOfTagDocs > 0 then Some (collection.AsQueryable().First()) else None
+    
   let getArticleViaOptions options = 
     ()
 
