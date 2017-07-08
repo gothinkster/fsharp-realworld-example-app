@@ -24,6 +24,11 @@ suaveio/obj
 suaveio/tests/obj
 suaveio/tests/bin
 suaveio/tests/packages
+suaveio_dotnetcore2/packages
+suaveio_dotnetcore2/obj
+suaveio_dotnetcore2/bin
+suaveio_dotnetcore2/tests/bin
+suaveio_dotnetcore2/tests/obj
 .vscode
 
 suaveio/packages/
