@@ -99,6 +99,13 @@ let tests =
       Expect.equal article.Article.Title "This is a new test title" "Title did not match."
 
     testCase "Should return empty taglist from the database" <| fun _ -> 
-      (* Add test case for getting the taglist *)
-      Expect.equal true true "this failed to return an empty list"
+      let routeResponse = 
+        GetRequest "/tags"
+        |> Program.app databaseClient
+        |> extractContext
+
+      // Should return the default value for when tags don't exist in dotthe database
+      let tagList = routeResponse.response.content |> getContent |> Suave.Json.fromJson<TagCloud> 
+      
+      Expect.equal (Array.length tagList.Tags) 0 "this failed to return an empty list"
   ]
