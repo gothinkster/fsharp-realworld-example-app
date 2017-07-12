@@ -40,7 +40,7 @@ module DB =
                                       BsonElement("article", BsonValue.Create articleDetails)
                                   ])
 
-    let collection = dbClient.GetCollection<BsonDocument> "Articles"
+    let collection = dbClient.GetCollection<BsonDocument> "Article"
     collection.InsertOne(bsonArticle)    
     article
 
