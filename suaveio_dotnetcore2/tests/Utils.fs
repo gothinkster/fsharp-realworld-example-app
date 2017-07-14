@@ -50,3 +50,8 @@ namespace Helper
     let getContent  = function
       | Bytes a -> a
       | _ -> failwith "Didn't return string content."
+
+    module DB = 
+      let hardCodedDbClient = 
+        let client = new MongoClient("mongodb://localhost:27017")
+        client.GetDatabase("realworld")

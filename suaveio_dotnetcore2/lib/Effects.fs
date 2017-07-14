@@ -23,6 +23,10 @@ module DB =
   let getArticleViaOptions options = 
     ()
 
+  let getSavedArticles (dbClient : IMongoDatabase) =
+    let collection = dbClient.GetCollection<Article>("Article")
+    collection.AsQueryable().ToList() |> List.ofSeq
+
   let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 
     let articleDetails = BsonDocument([
                                         BsonElement("slug", BsonValue.Create article.Article.Slug);
