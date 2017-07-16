@@ -15,7 +15,7 @@ module Actions =
     request ( fun inputGraph -> 
       Suave.Json.fromJson<UserRequest> inputGraph.rawForm
       |> registerWithBson dbClient 
-      |> Realworld.Convert.userRequestToUser 
+      |> RealWorld.Convert.userRequestToUser 
       |> jsonToString 
       |> Successful.OK
     )
@@ -31,7 +31,7 @@ module Actions =
 
       userToUpdate
       |> updateRequestedUser dbClient
-      |> Realworld.Convert.updateUser userToUpdate
+      |> RealWorld.Convert.updateUser userToUpdate
       |> Successful.OK
     )
 
@@ -47,7 +47,7 @@ module Actions =
   let getArticlesBy slug dbClient =
     (* TODO: Add suave testing for this. *)
     getArticleBySlug dbClient slug
-    |> Realworld.Convert.extractArticleList
+    |> RealWorld.Convert.extractArticleList
     |> jsonToString
     |> Successful.OK
 
@@ -60,4 +60,8 @@ module Actions =
     |> defaultTagsIfEmpty
     |> jsonToString
     |> Successful.OK 
-    
+
+  let getArticles dbClient = 
+    getSavedArticles dbClient
+    |> jsonToString
+    |> Successful.OK

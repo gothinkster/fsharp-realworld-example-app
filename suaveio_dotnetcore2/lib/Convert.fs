@@ -1,4 +1,4 @@
-namespace Realworld
+namespace RealWorld
 module Convert =
   open RealWorld.Models
   open MongoDB.Bson
@@ -26,7 +26,9 @@ module Convert =
     { Username = ""; Bio = ""; Image = ""; Following = false;}
 
   let defaultArticle =
-    { Article = 
+    { 
+      Id=(BsonObjectId(ObjectId.GenerateNewId()));
+      Article = 
       { Slug = ""; 
         Title = ""; 
         Description = ""; 

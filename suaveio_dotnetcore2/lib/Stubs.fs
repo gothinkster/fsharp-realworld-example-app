@@ -2,6 +2,7 @@ namespace RealWorld.Stubs
 
 open Suave.Json
 open RealWorld.Models
+open MongoDB.Bson
 
 (*
   These are just stubs that will be eventually replaced with the real implementation.
@@ -28,6 +29,7 @@ module Responses =
 
   let singleArticle = 
     {
+      Id=(BsonObjectId(ObjectId.GenerateNewId()));
       Article = {
                   Slug = "";
                   Title = "This is a new test title";

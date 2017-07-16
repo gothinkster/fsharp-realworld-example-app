@@ -7,6 +7,7 @@ module DB =
   open RealWorld.Models 
   open MongoDB.Bson
   open MongoDB.Driver.Linq
+  
 
   // TODO: Convert side effects to return option types
   let currentDir = Directory.GetCurrentDirectory()
@@ -24,7 +25,8 @@ module DB =
     ()
 
   let getSavedArticles (dbClient : IMongoDatabase) =
-    let collection = dbClient.GetCollection<Article>("Article")
+    let collection = dbClient.GetCollection<TestArticle>("Article")
+    // collection.Count(Builders.Filter.Empty)
     collection.AsQueryable().ToList() |> List.ofSeq
 
   let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 

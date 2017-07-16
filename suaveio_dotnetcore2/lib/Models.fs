@@ -39,7 +39,7 @@ namespace RealWorld
     type User = {
       [<field : DataMember(Name = "user")>]
       User : UserDetails;
-      Id : BsonObjectId
+      Id : BsonObjectId;
     }
 
     [<DataContract>]
@@ -60,7 +60,8 @@ namespace RealWorld
       Profile : ProfileDetails;
     }
 
-    // Look into if the taglist needs to be included
+    // Update the case of these because the datamember attributes don't work
+    // when serializing back.
     [<DataContract>]
     type ArticleDetails = {
       [<field : DataMember(Name = "slug")>]
@@ -89,6 +90,38 @@ namespace RealWorld
     type Article = {
       [<field : DataMember(Name = "article")>]
       Article : ArticleDetails;
+      Id : BsonObjectId;
+    }
+
+     [<DataContract>]
+    type TestArticleDetails = {
+      [<field : DataMember(Name = "slug")>]
+      slug : string;
+      [<field : DataMember(Name = "title")>]
+      title : string;
+      [<field : DataMember(Name = "description")>]
+      description : string;
+      [<field : DataMember(Name = "body")>]
+      body : string;
+      [<field : DataMember(Name = "createdat")>]
+      createdat : string;
+      [<field : DataMember(Name = "updatedat")>]
+      updatedat : string;
+      [<field : DataMember(Name = "favorited")>]
+      favorited : bool;
+      [<field : DataMember(Name = "favoritesCount")>]
+      favoritesCount : uint32;
+      [<field : DataMember(Name = "author")>]
+      author : ProfileDetails;
+      [<field : DataMember(Name = "tagList")>]
+      taglist : string array
+    }
+
+    [<DataContract>]
+    type TestArticle = {
+      [<field : DataMember(Name = "article")>]
+      article : TestArticleDetails;
+      Id : BsonObjectId;
     }
 
     [<DataContract>]

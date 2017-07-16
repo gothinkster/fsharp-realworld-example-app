@@ -7,13 +7,13 @@ namespace Helper
     open Suave.Web
 
     let withUri url httpCtx =
-      let uri = new System.Uri("http://some.phony.url" + url)
+      let uri = System.Uri("http://some.phony.url" + url)
       let rawQuery = uri.Query.TrimStart('?')
       let req = { httpCtx.request with url = uri; rawQuery = rawQuery;  }
       { httpCtx with request = req }
 
     let withUriForPost url json httpCtx =
-      let uri = new System.Uri("http://some.phony.url" + url)      
+      let uri = System.Uri("http://some.phony.url" + url)      
       let req = { httpCtx.request with url = uri; rawForm = json;  }
       { httpCtx with request = req }
 
@@ -37,7 +37,7 @@ namespace Helper
     
     let databaseClient =
       let mongoConn : string = "mongodb://localhost:27017"
-      let client = new MongoClient(mongoConn)
+      let client = MongoClient(mongoConn)
       client.GetDatabase("realworld")
 
     let possibleResult = function
@@ -50,3 +50,4 @@ namespace Helper
     let getContent  = function
       | Bytes a -> a
       | _ -> failwith "Didn't return string content."
+      

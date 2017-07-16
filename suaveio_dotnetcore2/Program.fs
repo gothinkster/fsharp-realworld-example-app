@@ -65,7 +65,7 @@ let app (dbClient: IMongoDatabase) =
     // Come back to these when authentication gets implemented because it's needed to follow a user by their username
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
-    GET  >=> path "/articles" >=> (Successful.OK Responses.multipleArticles)
+    GET  >=> path "/articles" >=> getArticles dbClient
     GET  >=> path "/articles/feed" >=> (Successful.OK Responses.multipleArticles)
     GET  >=> pathScan "/articles/%s" (fun slug -> confirmCall ())
     PUT  >=> pathScan "/articles/%s" (fun slug -> Successful.OK Responses.singleArticle)
