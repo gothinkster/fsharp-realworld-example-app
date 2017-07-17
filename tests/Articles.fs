@@ -8,5 +8,5 @@ let tests =
   testList "Articles" [
     testCase "should return default article" <| fun _ -> 
       let article = extractArticleList None 
-      Expect.isEmpty article.article.Title "did't work son"
+      Expect.isEmpty article.article.title "did't work son"
   ]
