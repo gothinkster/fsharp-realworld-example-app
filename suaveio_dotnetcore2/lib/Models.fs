@@ -7,94 +7,63 @@ namespace RealWorld
     [<DataContract>]
     type UserRequestDetails = {
       [<field : DataMember(Name = "username")>]
-      Username : string;
+      username : string;
       [<field : DataMember(Name = "email")>]
-      Email : string;
+      email : string;
       [<field : DataMember(Name = "password")>]
-      Password : string;
+      password : string;
     }
 
     [<DataContract>]
     type UserRequest = {
       [<field: DataMember(Name = "user")>]
-      User : UserRequestDetails;
+      user : UserRequestDetails;
     }
     
     [<DataContract>]
     type UserDetails = {
       [<field : DataMember(Name = "email")>]
-      Email : string;
+      email : string;
       [<field : DataMember(Name = "token")>]
-      Token : string;
+      token : string;
       [<field : DataMember(Name = "username")>]
-      Username : string;
+      username : string;
       [<field : DataMember(Name = "bio")>]
-      Bio : string;
+      bio : string;
       [<field : DataMember(Name = "image")>]
-      Image : string;
+      image : string;
       PasswordHash : string;
     }
 
     [<DataContract>]
     type User = {
       [<field : DataMember(Name = "user")>]
-      User : UserDetails;
+      user : UserDetails;
       Id : BsonObjectId;
     }
 
     [<DataContract>]
     type ProfileDetails = {
       [<field : DataMember(Name = "username")>]
-      Username : string;
+      username : string;
       [<field : DataMember(Name = "bio")>]
-      Bio : string;
+      bio : string;
       [<field : DataMember(Name = "image")>]
-      Image : string;
+      image : string;
       [<field : DataMember(Name = "following")>]
-      Following : bool
+      following : bool
     }
 
     [<DataContract>]
     type Profile = {
       [<field : DataMember(Name = "profile")>]
-      Profile : ProfileDetails;
+      profile : ProfileDetails;
     }
 
     // Update the case of these because the datamember attributes don't work
     // when serializing back.
     [<DataContract>]
     type ArticleDetails = {
-      [<field : DataMember(Name = "slug")>]
-      Slug : string;
-      [<field : DataMember(Name = "title")>]
-      Title : string;
-      [<field : DataMember(Name = "description")>]
-      Description : string;
-      [<field : DataMember(Name = "body")>]
-      Body : string;
-      [<field : DataMember(Name = "createdat")>]
-      CreatedAt : string;
-      [<field : DataMember(Name = "updatedat")>]
-      UpdatedAt : string;
-      [<field : DataMember(Name = "favorited")>]
-      Favorited : bool;
-      [<field : DataMember(Name = "favoritesCount")>]
-      FavoritesCount : uint32;
-      [<field : DataMember(Name = "author")>]
-      Author : ProfileDetails;
-      [<field : DataMember(Name = "tagList")>]
-      Taglist : string array
-    }
-
-    [<DataContract>]
-    type Article = {
-      [<field : DataMember(Name = "article")>]
-      Article : ArticleDetails;
-      Id : BsonObjectId;
-    }
-
-     [<DataContract>]
-    type TestArticleDetails = {
       [<field : DataMember(Name = "slug")>]
       slug : string;
       [<field : DataMember(Name = "title")>]
@@ -104,9 +73,9 @@ namespace RealWorld
       [<field : DataMember(Name = "body")>]
       body : string;
       [<field : DataMember(Name = "createdat")>]
-      createdat : string;
+      createdAt : string;
       [<field : DataMember(Name = "updatedat")>]
-      updatedat : string;
+      updatedAt : string;
       [<field : DataMember(Name = "favorited")>]
       favorited : bool;
       [<field : DataMember(Name = "favoritesCount")>]
@@ -118,63 +87,63 @@ namespace RealWorld
     }
 
     [<DataContract>]
-    type TestArticle = {
+    type Article = {
       [<field : DataMember(Name = "article")>]
-      article : TestArticleDetails;
+      article : ArticleDetails;
       Id : BsonObjectId;
-    }
+    }  
 
     [<DataContract>]
     type Articles = {
       [<field : DataMember(Name = "articles")>]
-      Articles : ArticleDetails array;
+      articles : ArticleDetails array;
       [<field : DataMember(Name = "articlesCount")>]
-      ArticlesCount : uint32;
+      articlesCount : uint32;
     }
 
     [<DataContract>]
     type CommentDetails = {
       [<field : DataMember(Name = "id")>]
-      Id : uint32;
+      id : uint32;
       [<field : DataMember(Name = "createdAt")>]
-      CreatedAt : string;
+      createdAt : string;
       [<field : DataMember(Name = "updatedAt")>]
-      UpdatedAt : string;
+      updatedAt : string;
       [<field : DataMember(Name = "body")>]
-      Body : string;
+      body : string;
       [<field : DataMember(Name = "author")>]
-      Author : ProfileDetails;
+      author : ProfileDetails;
     }
 
     [<DataContract>]
     type Comment = {
       [<field : DataMember(Name = "comment")>]
-      Comment : CommentDetails;
+      comment : CommentDetails;
     }
 
     [<DataContract>]
     type Comments = {
       [<field : DataMember(Name = "comments")>]
-      Comments : CommentDetails array;
+      comments : CommentDetails array;
     }
 
     // We have to use arrays when serializing. The serializer doesn't understand lists.
     [<DataContract>]
     type TagCloud = {
       [<field : DataMember(Name = "tags")>]
-      Tags : string array;
+      tags : string array;
     }
 
     [<DataContract>]
     type ErrorBody = {
       [<field : DataMember(Name = "body")>]
-      Body : string array;
+      body : string array;
     }
 
     [<DataContract>]
     type ErrorReport = {
       [<field : DataMember(Name = "error")>]
-      Errors : ErrorBody;
+      errors : ErrorBody;
     }
 
     type ArticleOptions = {

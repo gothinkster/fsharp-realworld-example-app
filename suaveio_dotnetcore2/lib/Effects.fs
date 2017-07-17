@@ -25,14 +25,14 @@ module DB =
     ()
 
   let getSavedArticles (dbClient : IMongoDatabase) =
-    let collection = dbClient.GetCollection<TestArticle>("Article")
+    let collection = dbClient.GetCollection<Article>("Article")
     // collection.Count(Builders.Filter.Empty)
     collection.AsQueryable().ToList() |> List.ofSeq
 
   let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 
     let articleDetails = BsonDocument([
-                                        BsonElement("slug", BsonValue.Create article.Article.Slug);
-                                        BsonElement("title", BsonValue.Create article.Article.Title);
+                                        BsonElement("slug", BsonValue.Create article.article.slug);
+                                        BsonElement("title", BsonValue.Create article.article.title);
                                         BsonElement("description", BsonValue.Create "");
                                         BsonElement("body", BsonValue.Create "");
                                         BsonElement("createdat", BsonValue.Create "");
@@ -52,7 +52,7 @@ module DB =
 
   let getDBClient () = 
     let mongoConn : string = (currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:DefaultConnection")
-    let client = new MongoClient(mongoConn)
+    let client = MongoClient(mongoConn)
     client.GetDatabase((currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:dbname"))
 
   (* 
@@ -62,8 +62,8 @@ module DB =
   let registerWithBson (dbClient: IMongoDatabase) (request: UserRequest) = 
     // TODO: Add the password hash
     let details = BsonDocument ([
-                                  BsonElement("username", BsonValue.Create request.User.Username);
-                                  BsonElement("email", BsonValue.Create request.User.Email);
+                                  BsonElement("username", BsonValue.Create request.user.username);
+                                  BsonElement("email", BsonValue.Create request.user.email);
                                   BsonElement("token", BsonValue.Create "");
                                   BsonElement("bio", BsonValue.Create "");
                                   BsonElement("image", BsonValue.Create "");
@@ -85,10 +85,10 @@ module DB =
   let updateRequestedUser (dbClient : IMongoDatabase) (request : UserDetails) = 
     let collection = dbClient.GetCollection<User> "Users"
     
-    let requestedUser = Builders.Filter.Eq((fun doc -> doc.User.Email), request.Email)
-    let updateUser = Builders.Update.Set((fun doc -> doc.User.Bio), request.Bio)
-                                    .Set((fun doc -> doc.User.Image), request.Image)
-                                    .Set((fun doc -> doc.User.Username), request.Username)
+    let requestedUser = Builders.Filter.Eq((fun doc -> doc.user.email), request.email)
+    let updateUser = Builders.Update.Set((fun doc -> doc.user.bio), request.bio)
+                                    .Set((fun doc -> doc.user.image), request.image)
+                                    .Set((fun doc -> doc.user.username), request.username)
                
     Some (collection.UpdateOne(requestedUser, updateUser))
     
@@ -97,12 +97,12 @@ module DB =
     // TODO: Check if the user already exist
     let newUser = {
       Id = BsonObjectId(ObjectId.GenerateNewId());
-      User = {
-                Username = request.User.Username;
-                Email = request.User.Email;
-                Token = "";
-                Bio = "";
-                Image = "";
+      user = {
+                username = request.user.username;
+                email = request.user.email;
+                token = "";
+                bio = "";
+                image = "";
                 PasswordHash = "";
       }
     }
@@ -114,12 +114,12 @@ module DB =
 
     // TODO: Finish JWT authentication; Below is an example of how to use filters for mongo
     //let passwordFilter = Builders.Filter.Eq((fun doc -> doc.Password), request.Password)
-    let usernameFilter = Builders.Filter.Eq((fun doc -> doc.Email), request.User.Email)
+    let usernameFilter = Builders.Filter.Eq((fun doc -> doc.email), request.user.email)
     //let filter = Builders.Filter.And(passwordFilter, usernameFilter)
     // Return collections to avoid leaking nulls into your program from C#.
     collection.Find(usernameFilter).ToList() |> Seq.first
 
   let getArticleBySlug (dbClient: IMongoDatabase) slug = 
     let collection = dbClient.GetCollection<Article>("Article")
-    let articleFilter = Builders.Filter.Eq((fun article -> article.Article.Slug), slug)
+    let articleFilter = Builders.Filter.Eq((fun article -> article.article.slug), slug)
     collection.Find(articleFilter).ToList() |> Seq.first

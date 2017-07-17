@@ -9,7 +9,7 @@ module Actions =
   let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let fakeReply email = 
-    {User = { Email = email; Token = ""; Username=""; Bio=""; Image=""; PasswordHash=""; }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
+    {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
     
   let registerUserNewUser dbClient = 
     request ( fun inputGraph -> 
@@ -27,7 +27,7 @@ module Actions =
 
   let updateUser dbClient = 
     request (fun inputGraph ->
-      let userToUpdate = (Suave.Json.fromJson<User> inputGraph.rawForm).User
+      let userToUpdate = (Suave.Json.fromJson<User> inputGraph.rawForm).user
 
       userToUpdate
       |> updateRequestedUser dbClient
@@ -53,7 +53,7 @@ module Actions =
 
   let defaultTagsIfEmpty = function
     | Some tags -> tags
-    | None -> { Tags = [||] }
+    | None -> { tags = [||] }
 
   let getTagList dbClient =
     getSavedTagList dbClient 

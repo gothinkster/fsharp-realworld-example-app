@@ -45,7 +45,7 @@ let routeByOptions (queryParameters : HttpRequest) =
   (Successful.OK "successful")
 
 let initProfile = 
-  {Username = ""; Bio = ""; Image = ""; Following = false;}
+  {username = ""; bio = ""; image = ""; following = false;}
 
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient

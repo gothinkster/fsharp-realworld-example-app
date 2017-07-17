@@ -11,64 +11,64 @@ open MongoDB.Bson
 module Responses =
   let singleProfile = 
     {
-      Profile = {
-                  Username = "test";
-                  Bio = "This is a test bio";
-                  Image = "";
-                  Following = false;
+      profile = {
+                  username = "test";
+                  bio = "This is a test bio";
+                  image = "";
+                  following = false;
                 }
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let getFakeAuthor = 
     {
-      Username = "SampleJoe";
-      Bio = "New programmer";
-      Image = "";
-      Following = false;
+      username = "SampleJoe";
+      bio = "New programmer";
+      image = "";
+      following = false;
     }
 
   let singleArticle = 
     {
       Id=(BsonObjectId(ObjectId.GenerateNewId()));
-      Article = {
-                  Slug = "";
-                  Title = "This is a new test title";
-                  Description = "This is an example of a canned description.";
-                  Body = "This is the main body that the viewer will be reading";
-                  CreatedAt = "";
-                  UpdatedAt = "";
-                  Favorited = false;
-                  FavoritesCount = 2u;
-                  Author = getFakeAuthor;
-                  Taglist = [|"programming"|]
+      article = {
+                  slug = "";
+                  title = "This is a new test title";
+                  description = "This is an example of a canned description.";
+                  body = "This is the main body that the viewer will be reading";
+                  createdAt = "";
+                  updatedAt = "";
+                  favorited = false;
+                  favoritesCount = 2u;
+                  author = getFakeAuthor;
+                  taglist = [|"programming"|]
                 }
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let tagList = 
     {
-      Tags = [|"test"; "functional"|]
+      tags = [|"test"; "functional"|]
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let singleComment = 
     {
-      Comment = {
-                  Id = 3123414u;
-                  CreatedAt = "";
-                  UpdatedAt = "";
-                  Body = "Full body of the comment";
-                  Author = getFakeAuthor
+      comment = {
+                  id = 3123414u;
+                  createdAt = "";
+                  updatedAt = "";
+                  body = "Full body of the comment";
+                  author = getFakeAuthor
                 }
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let multipleComments = 
     {
-      Comments = [|
+      comments = [|
                   {
-                    Id = 8293u;
-                    CreatedAt = "";
-                    UpdatedAt = "";
-                    Body = "this is a fake comment";
-                    Author = getFakeAuthor;
+                    id = 8293u;
+                    createdAt = "";
+                    updatedAt = "";
+                    body = "this is a fake comment";
+                    author = getFakeAuthor;
                   }
       |]  
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
@@ -76,33 +76,33 @@ module Responses =
   let multiArticle title description body = 
     [|
       {
-        Slug = "Not sure what this is";
-        Title = title;
-        Description = description;
-        Body = body;
-        CreatedAt = "";
-        UpdatedAt = "";
-        Favorited = false;
-        FavoritesCount = 2u;
-        Author = getFakeAuthor;
-        Taglist = [|"functional"|]
+        slug = "Not sure what this is";
+        title = title;
+        description = description;
+        body = body;
+        createdAt = "";
+        updatedAt = "";
+        favorited = false;
+        favoritesCount = 2u;
+        author = getFakeAuthor;
+        taglist = [|"functional"|]
       };
       {
-        Slug = "what was said before";
-        Title = title + " second";
-        Description = description + " second one";
-        Body = body + " second part";
-        CreatedAt = "";
-        UpdatedAt = "";
-        Favorited = false;
-        FavoritesCount = 2u;
-        Author = getFakeAuthor;
-        Taglist = [|"Rust"|]
+        slug = "what was said before";
+        title = title + " second";
+        description = description + " second one";
+        body = body + " second part";
+        createdAt = "";
+        updatedAt = "";
+        favorited = false;
+        favoritesCount = 2u;
+        author = getFakeAuthor;
+        taglist = [|"Rust"|]
       }
     |]
 
   let multipleArticles = 
     {
-      Articles = multiArticle "test title" "some new description" "some presentation body";
-      ArticlesCount = 2u;
+      articles = multiArticle "test title" "some new description" "some presentation body";
+      articlesCount = 2u;
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString

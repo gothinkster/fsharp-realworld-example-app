@@ -6,13 +6,13 @@ module Convert =
 
   let userRequestToUser (user: UserRequest) = 
     {
-      User = {
-                Username = user.User.Username;
-                Email = user.User.Email;
+      user = {
+                username = user.user.username;
+                email = user.user.email;
                 PasswordHash = "";
-                Token = "";
-                Bio = "";
-                Image = "";
+                token = "";
+                bio = "";
+                image = "";
             };
       Id = BsonObjectId.Empty
     }
@@ -20,25 +20,25 @@ module Convert =
   let updateUser (user:UserDetails) (result : UpdateResult option) : string  =
     match result with
     | Some _ ->  user |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
-    | None -> { Errors = { Body = [|"Error updating this user."|] } } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
+    | None -> { errors = { body = [|"Error updating this user."|] } } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let defaultProfile =
-    { Username = ""; Bio = ""; Image = ""; Following = false;}
+    { username = ""; bio = ""; image = ""; following = false;}
 
   let defaultArticle =
     { 
       Id=(BsonObjectId(ObjectId.GenerateNewId()));
-      Article = 
-      { Slug = ""; 
-        Title = ""; 
-        Description = ""; 
-        Body = ""; 
-        CreatedAt = ""; 
-        UpdatedAt = ""; 
-        Favorited = false; 
-        FavoritesCount = 0u; 
-        Author = defaultProfile; 
-        Taglist = [||]  }
+      article = 
+      { slug = ""; 
+        title = ""; 
+        description = ""; 
+        body = ""; 
+        createdAt = ""; 
+        updatedAt = ""; 
+        favorited = false; 
+        favoritesCount = 0u; 
+        author = defaultProfile; 
+        taglist = [||]  }
     }
 
   let extractArticleList (result) =
