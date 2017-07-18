@@ -55,6 +55,10 @@ module Actions =
     | Some tags -> tags
     | None -> { tags = [||] }
 
+  let defaultArticleIfEmpty = function
+    | Some articles -> Array.ofList articles
+    | None -> [||]
+
   let getTagList dbClient =
     getSavedTagList dbClient 
     |> defaultTagsIfEmpty
@@ -63,5 +67,6 @@ module Actions =
 
   let getArticles dbClient = 
     getSavedArticles dbClient
+    |> defaultArticleIfEmpty
     |> jsonToString
     |> Successful.OK

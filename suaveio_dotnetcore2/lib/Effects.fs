@@ -26,8 +26,8 @@ module DB =
 
   let getSavedArticles (dbClient : IMongoDatabase) =
     let collection = dbClient.GetCollection<Article>("Article")
-    // collection.Count(Builders.Filter.Empty)
-    collection.AsQueryable().ToList() |> List.ofSeq
+    let articleList = collection.AsQueryable().ToList() |> List.ofSeq
+    if not (List.isEmpty articleList) then Some (articleList) else None
 
   let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 
     let articleDetails = BsonDocument([
