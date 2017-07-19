@@ -7,7 +7,6 @@ module DB =
   open RealWorld.Models 
   open MongoDB.Bson
   open MongoDB.Driver.Linq
-  
 
   // TODO: Convert side effects to return option types
   let currentDir = Directory.GetCurrentDirectory()
@@ -25,8 +24,19 @@ module DB =
     ()
 
   let getSavedArticles (dbClient : IMongoDatabase) =
+    // TODO: Add sort by date desc to query
     let collection = dbClient.GetCollection<Article>("Article")
-    let articleList = collection.AsQueryable().ToList() |> List.ofSeq
+    let articleList = collection.AsQueryable()
+                                .OrderByDescending(fun art -> art.article.createdAt)
+                                .ToList() |> List.ofSeq
+    if not (List.isEmpty articleList) then Some (articleList) else None
+
+  let getSavedFollowedArticles (dbClient : IMongoDatabase) = 
+    let collection = dbClient.GetCollection<Article>("Article")
+    let articleList = collection.AsQueryable()
+                                .Where(fun art -> art.article.author.following)
+                                .OrderByDescending(fun art -> art.article.createdAt)
+                                .ToList() |> List.ofSeq
     if not (List.isEmpty articleList) then Some (articleList) else None
 
   let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 

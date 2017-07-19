@@ -50,10 +50,6 @@ let initProfile =
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient
 
-let confirmCall () =
-  (* TODO: Complete getting the article by it's slug *)
-  Successful.OK Responses.singleArticle
-
 //TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
   choose [
@@ -66,8 +62,8 @@ let app (dbClient: IMongoDatabase) =
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     GET  >=> path "/articles" >=> getArticles dbClient
-    GET  >=> path "/articles/feed" >=> (Successful.OK Responses.multipleArticles)
-    GET  >=> pathScan "/articles/%s" (fun slug -> confirmCall ())
+    GET  >=> path "/articles/feed" >=> getArticlesForFeed dbClient
+    GET  >=> pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
     PUT  >=> pathScan "/articles/%s" (fun slug -> Successful.OK Responses.singleArticle)
     DELETE >=> path "/articles/:slug" >=> (Successful.OK Responses.singleArticle)
     POST >=> path "/articles/:slug/comments" >=> (Successful.OK Responses.singleComment)

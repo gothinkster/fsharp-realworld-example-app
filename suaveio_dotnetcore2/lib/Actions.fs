@@ -65,8 +65,16 @@ module Actions =
     |> jsonToString
     |> Successful.OK 
 
+  (* TODO: Look into consolidating these functions since they are close in functionality *)
   let getArticles dbClient = 
     getSavedArticles dbClient
     |> defaultArticleIfEmpty
     |> jsonToString
     |> Successful.OK
+
+  let getArticlesForFeed dbClient = 
+    getSavedFollowedArticles dbClient
+    |> defaultArticleIfEmpty
+    |> jsonToString
+    |> Successful.OK
+    

@@ -16,7 +16,6 @@ open RealWorld.Models
 let tests = 
   testList "Integration" [
     testCase "Current working test for trying out impure functions" <| fun _ ->
-      let userDetails = {username=""; email=""; password=""}
-      printfn "json: %A" (RealWorld.Effects.Actions.jsonToString [||])
-      Expect.equal true true String.Empty
+      let articles = RealWorld.Effects.DB.getSavedFollowedArticles databaseClient
+      Expect.equal articles None String.Empty
   ]
