@@ -77,4 +77,8 @@ module Actions =
     |> defaultArticleIfEmpty
     |> jsonToString
     |> Successful.OK
+
+  let addArticleWithSlug slug dbClient = 
+    (* TODO: Added article record *)
+    (Successful.OK "")
     

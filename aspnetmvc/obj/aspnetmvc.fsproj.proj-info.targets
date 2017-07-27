@@ -37,8 +37,9 @@
         AlwaysCreate="True" />
   </Target>
 
-  <Target Name="_Inspect_GetProperties"
-          DependsOnTargets="ResolveReferences">
+  <Target Name="_Inspect_GetProperties_CrossGen"
+          Condition=" '$(IsCrossTargetingBuild)' == 'true' "
+           >
     <ItemGroup>
         
         <_Inspect_GetProperties_OutLines Include="P0">
@@ -63,4 +64,36 @@
             Overwrite="true" 
             Encoding="UTF-8"/>
   </Target>
+
+  <Target Name="_Inspect_GetProperties_NotCrossGen"
+          Condition=" '$(IsCrossTargetingBuild)' != 'true' "
+          DependsOnTargets="ResolveReferences" >
+    <ItemGroup>
+        
+        <_Inspect_GetProperties_OutLines Include="P0">
+            <PropertyName>TargetPath</PropertyName>
+            <PropertyValue>$(TargetPath)</PropertyValue>
+        </_Inspect_GetProperties_OutLines>
+
+        <_Inspect_GetProperties_OutLines Include="P1">
+            <PropertyName>IsCrossTargetingBuild</PropertyName>
+            <PropertyValue>$(IsCrossTargetingBuild)</PropertyValue>
+        </_Inspect_GetProperties_OutLines>
+
+        <_Inspect_GetProperties_OutLines Include="P2">
+            <PropertyName>TargetFrameworks</PropertyName>
+            <PropertyValue>$(TargetFrameworks)</PropertyValue>
+        </_Inspect_GetProperties_OutLines></ItemGroup>
+    <Message Text="%(_Inspect_GetProperties_OutLines.PropertyName)=%(_Inspect_GetProperties_OutLines.PropertyValue)" Importance="High" />
+    <WriteLinesToFile
+            Condition=" '$(_Inspect_GetProperties_OutFile)' != '' "
+            File="$(_Inspect_GetProperties_OutFile)"
+            Lines="@(_Inspect_GetProperties_OutLines -> '%(PropertyName)=%(PropertyValue)')"
+            Overwrite="true" 
+            Encoding="UTF-8"/>
+  </Target>
+
+  <Target Name="_Inspect_GetProperties"
+          DependsOnTargets="_Inspect_GetProperties_CrossGen;_Inspect_GetProperties_NotCrossGen" />
+        
 </Project>
