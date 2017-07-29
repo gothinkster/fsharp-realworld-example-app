@@ -16,4 +16,4 @@
   <ItemGroup>
     <ProjectReference Include="..\suaveio_dotnetcore2\suaveio_dotnetcore2.fsproj" />
   </ItemGroup>
-</Project>
+</Project> 
