@@ -138,4 +138,4 @@ module DB =
   let deleteArticleBySlug slug (dbClient: IMongoDatabase) =
     let collection = dbClient.GetCollection<Article> "Article"
     collection.DeleteMany(articleFilter slug).DeletedCount > 0L
-    
+  

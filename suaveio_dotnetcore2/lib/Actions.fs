@@ -87,4 +87,5 @@ module Actions =
     |> Successful.OK
 
   let deleteArticleBy slug dbClient = Successful.OK ((deleteArticleBySlug slug dbClient).ToString())
-    
+  let addCommentBy json slug dbClient = 
+    Successful.OK ""
