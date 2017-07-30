@@ -85,4 +85,6 @@ module Actions =
     insertNewArticle ({currentArticle with article = updatedSlug }) dbClient
     |> jsonToString
     |> Successful.OK
+
+  let deleteArticleBy slug dbClient = Successful.OK ((deleteArticleBySlug slug dbClient).ToString())
     

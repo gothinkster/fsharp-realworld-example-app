@@ -129,7 +129,13 @@ module DB =
     // Return collections to avoid leaking nulls into your program from C#.
     collection.Find(usernameFilter).ToList() |> Seq.first
 
+  let articleFilter slug = Builders.Filter.Eq((fun article -> article.article.slug), slug)
+
   let getArticleBySlug (dbClient: IMongoDatabase) slug = 
     let collection = dbClient.GetCollection<Article>("Article")
-    let articleFilter = Builders.Filter.Eq((fun article -> article.article.slug), slug)
-    collection.Find(articleFilter).ToList() |> Seq.first
+    collection.Find(articleFilter slug).ToList() |> Seq.first
+
+  let deleteArticleBySlug slug (dbClient: IMongoDatabase) =
+    let collection = dbClient.GetCollection<Article> "Article"
+    collection.DeleteMany(articleFilter slug).DeletedCount > 0L
+    

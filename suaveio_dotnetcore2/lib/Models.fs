@@ -116,6 +116,18 @@ namespace RealWorld
     }
 
     [<DataContract>]
+    type CommentBody = {
+      [<field: DataMember(Name = "body")>]
+      body : string;
+    }
+
+    [<DataContract>]
+    type ArticleComment = {
+      [<field : DataMember(Name = "comment")>]
+      comment : CommentBody;
+    }
+
+    [<DataContract>]
     type Comment = {
       [<field : DataMember(Name = "comment")>]
       comment : CommentDetails;

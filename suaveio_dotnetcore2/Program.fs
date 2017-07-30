@@ -51,9 +51,6 @@ let initProfile =
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient
 
-let formToString ctx = 
-  String.Empty
-
 //TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
   choose [
@@ -69,7 +66,7 @@ let app (dbClient: IMongoDatabase) =
     GET  >=> path "/articles/feed" >=> getArticlesForFeed dbClient
     GET  >=> pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
     PUT  >=> pathScan "/articles/%s" (fun slug -> request(fun req -> addArticleWithSlug req.rawForm slug dbClient))
-    DELETE >=> path "/articles/:slug" >=> (Successful.OK Responses.singleArticle)
+    DELETE >=> pathScan "/articles/%s" (fun slug -> deleteArticleBy slug dbClient)
     POST >=> path "/articles/:slug/comments" >=> (Successful.OK Responses.singleComment)
     GET  >=> path "/articles/:slug/comments" >=> (Successful.OK Responses.multipleComments)
     DELETE >=> path "/articles/:slug/comments/:id" >=> (Successful.OK Responses.multipleComments)
