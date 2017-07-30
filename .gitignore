@@ -36,3 +36,4 @@ tests/packages
 tests/bin
 test/obj
 tests/obj
+aspnetmvc/obj

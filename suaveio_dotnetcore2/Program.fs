@@ -14,7 +14,8 @@ open RealWorld.Effects.Actions
 open MongoDB.Bson
 
 let serverConfig = 
-  { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" 8073] }
+  let randomPort = Random().Next(7000, 7999)
+  { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" randomPort] }
 
 let validateCredentials dbClient = 
   request (fun inputGraph -> 
@@ -50,6 +51,9 @@ let initProfile =
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient
 
+let formToString ctx = 
+  String.Empty
+
 //TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
   choose [
@@ -64,7 +68,7 @@ let app (dbClient: IMongoDatabase) =
     GET  >=> path "/articles" >=> getArticles dbClient
     GET  >=> path "/articles/feed" >=> getArticlesForFeed dbClient
     GET  >=> pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
-    PUT  >=> pathScan "/articles/%s" (fun slug -> addArticleWithSlug slug dbClient)
+    PUT  >=> pathScan "/articles/%s" (fun slug -> request(fun req -> addArticleWithSlug req.rawForm slug dbClient))
     DELETE >=> path "/articles/:slug" >=> (Successful.OK Responses.singleArticle)
     POST >=> path "/articles/:slug/comments" >=> (Successful.OK Responses.singleComment)
     GET  >=> path "/articles/:slug/comments" >=> (Successful.OK Responses.multipleComments)

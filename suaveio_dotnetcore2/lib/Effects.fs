@@ -43,13 +43,13 @@ module DB =
     let articleDetails = BsonDocument([
                                         BsonElement("slug", BsonValue.Create article.article.slug);
                                         BsonElement("title", BsonValue.Create article.article.title);
-                                        BsonElement("description", BsonValue.Create "");
-                                        BsonElement("body", BsonValue.Create "");
-                                        BsonElement("createdat", BsonValue.Create "");
-                                        BsonElement("updateat", BsonValue.Create "");
-                                        BsonElement("favorited", BsonValue.Create "");
-                                        BsonElement("favoritesCount", BsonValue.Create 0);
-                                        BsonElement("author", BsonValue.Create "");
+                                        BsonElement("description", BsonValue.Create article.article.description);
+                                        BsonElement("body", BsonValue.Create article.article.body);
+                                        BsonElement("createdat", BsonValue.Create article.article.createdAt);
+                                        BsonElement("updateat", BsonValue.Create article.article.updatedAt);
+                                        BsonElement("favorited", BsonValue.Create article.article.favorited);
+                                        BsonElement("favoritesCount", BsonValue.Create article.article.favoritesCount);
+                                        BsonElement("author", BsonValue.Create article.article.author);
                                         BsonElement("tagList", BsonValue.Create [||]);
                                       ])
     let bsonArticle = BsonDocument([

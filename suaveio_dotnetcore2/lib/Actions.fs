@@ -5,7 +5,7 @@ module Actions =
   open RealWorld.Models
   open DB
   open MongoDB.Bson
-
+  open System.Text
   let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let fakeReply email = 
@@ -78,7 +78,11 @@ module Actions =
     |> jsonToString
     |> Successful.OK
 
-  let addArticleWithSlug slug dbClient = 
-    (* TODO: Added article record *)
-    (Successful.OK "")
+  let addArticleWithSlug json (slug: string) (dbClient: MongoDB.Driver.IMongoDatabase) = 
+    let currentArticle = json |> Suave.Json.fromJson<Article> 
+    let updatedSlug = { currentArticle.article with slug = slug}
+    
+    insertNewArticle ({currentArticle with article = updatedSlug }) dbClient
+    |> jsonToString
+    |> Successful.OK
     
