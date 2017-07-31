@@ -87,5 +87,12 @@ module Actions =
     |> Successful.OK
 
   let deleteArticleBy slug dbClient = Successful.OK ((deleteArticleBySlug slug dbClient).ToString())
+
   let addCommentBy json slug dbClient = 
-    Successful.OK ""
+    let possibleArticleId = getArticleBySlug dbClient slug
+    match possibleArticleId with
+    | Some articleId -> 
+      saveNewComment (Suave.Json.fromJson<Comment> json) articleId dbClient |> ignore
+      Successful.OK (json |> jsonToString)
+    | None -> 
+      Successful.OK ({errors = {body = [|"Could not find article by slug"|]}} |> jsonToString) 

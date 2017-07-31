@@ -7,6 +7,7 @@ module DB =
   open RealWorld.Models 
   open MongoDB.Bson
   open MongoDB.Driver.Linq
+  open System
 
   // TODO: Convert side effects to return option types
   let currentDir = Directory.GetCurrentDirectory()
@@ -138,4 +139,21 @@ module DB =
   let deleteArticleBySlug slug (dbClient: IMongoDatabase) =
     let collection = dbClient.GetCollection<Article> "Article"
     collection.DeleteMany(articleFilter slug).DeletedCount > 0L
-  
+
+  let getArticleIdBySlug slug (dbClient: IMongoDatabase) = 
+    let requestedArticle = getArticleBySlug dbClient slug
+    match requestedArticle with
+    | Some article -> Some article.Id
+    | _ -> None
+
+  let saveNewComment (comment: Comment) articleId (dbClient: IMongoDatabase) =
+    let collection = dbClient.GetCollection<BsonDocument> "Comment"
+    (* TODO: Add user to the saved comment *)
+    let commentDetails = BsonDocument([
+                                        BsonElement("id",BsonValue.Create articleId);
+                                        BsonElement("createdAt",BsonDateTime.Create DateTime.Now);
+                                        BsonElement("updatedAt",BsonDateTime.Create DateTime.Now);
+                                        BsonElement("body",BsonValue.Create comment.comment.body);
+                                      ])
+    collection.InsertOne commentDetails
+    comment
