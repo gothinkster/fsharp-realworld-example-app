@@ -20,10 +20,7 @@ module DB =
     let collection = dbClient.GetCollection<TagCloud>("Tags")
     let numberOfTagDocs = collection.AsQueryable().ToList().Count
     if numberOfTagDocs > 0 then Some (collection.AsQueryable().First()) else None
-    
-  let getArticleViaOptions options = 
-    ()
-
+ 
   let getSavedArticles (dbClient : IMongoDatabase) =
     // TODO: Add sort by date desc to query
     let collection = dbClient.GetCollection<Article>("Article")
