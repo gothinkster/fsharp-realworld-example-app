@@ -104,7 +104,7 @@ namespace RealWorld
     [<DataContract>]
     type CommentDetails = {
       [<field : DataMember(Name = "id")>]
-      id : uint32;
+      id : string;
       [<field : DataMember(Name = "createdAt")>]
       createdAt : string;
       [<field : DataMember(Name = "updatedAt")>]

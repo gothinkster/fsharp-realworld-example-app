@@ -52,7 +52,7 @@ module Responses =
   let singleComment = 
     {
       comment = {
-                  id = 3123414u;
+                  id = "";
                   createdAt = "";
                   updatedAt = "";
                   body = "Full body of the comment";
@@ -64,7 +64,7 @@ module Responses =
     {
       comments = [|
                   {
-                    id = 8293u;
+                    id = "";
                     createdAt = "";
                     updatedAt = "";
                     body = "this is a fake comment";

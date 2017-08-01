@@ -157,3 +157,15 @@ module DB =
                                       ])
     collection.InsertOne commentDetails
     comment
+
+  let getCommentsWithArticleId art (dbClient: IMongoDatabase) = 
+    let collection = dbClient.GetCollection<Comment> "Comment"
+    let commentFilter = Builders.Filter.Eq((fun comment -> comment.comment.id), art.Id.ToString())
+    collection.Find(commentFilter).ToList() |> List.ofSeq
+
+  let getCommentsFromArticlesBySlug slug (dbClient: IMongoDatabase) =
+    let collection = dbClient.GetCollection<Article> "Article"
+    let article = collection.Find(articleFilter slug).ToList() |> Seq.first
+    match article with
+    | Some art -> getCommentsWithArticleId art dbClient
+    | _ -> List.empty<Comment>
