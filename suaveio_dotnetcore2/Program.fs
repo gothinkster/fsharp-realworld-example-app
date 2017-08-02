@@ -69,7 +69,7 @@ let app (dbClient: IMongoDatabase) =
     DELETE >=> pathScan "/articles/%s" (fun slug -> deleteArticleBy slug dbClient)
     POST >=> pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))  
     GET  >=> pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
-    DELETE >=> path "/articles/:slug/comments/:id" >=> (Successful.OK Responses.multipleComments)
+    DELETE >=> pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)
     POST >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
     DELETE >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
     POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle dbClient)) // Creates a new article

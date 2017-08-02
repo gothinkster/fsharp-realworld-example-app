@@ -101,3 +101,8 @@ module Actions =
     getCommentsFromArticlesBySlug slug dbClient
     |> jsonToString
     |> Successful.OK 
+
+  let deleteComment (_, (id: string)) dbCLient = 
+    deleteWithCommentId id dbCLient
+    |> jsonToString
+    |> Successful.OK

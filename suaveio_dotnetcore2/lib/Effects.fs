@@ -166,3 +166,8 @@ module DB =
     match article with
     | Some art -> getCommentsWithArticleId art dbClient
     | _ -> List.empty<Comment>
+
+  let deleteWithCommentId id (dbClient: IMongoDatabase) =
+    let collection = dbClient.GetCollection<Comment> "Comment"
+    collection.DeleteOne(Builders.Filter.Eq((fun comment -> comment.comment.id), id)).DeletedCount > 0L
+    
