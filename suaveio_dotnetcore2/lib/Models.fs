@@ -33,6 +33,7 @@ namespace RealWorld
       [<field : DataMember(Name = "image")>]
       image : string;
       PasswordHash : string;
+      favorites : string array;
     }
 
     [<DataContract>]
