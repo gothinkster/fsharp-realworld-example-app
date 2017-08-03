@@ -112,6 +112,7 @@ module DB =
                 bio = "";
                 image = "";
                 PasswordHash = "";
+                favorites = [||];
       }
     }
     let collection = dbClient.GetCollection<User>("Users")

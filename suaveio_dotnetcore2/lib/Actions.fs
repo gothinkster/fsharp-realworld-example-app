@@ -9,7 +9,7 @@ module Actions =
   let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let fakeReply email = 
-    {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
+    {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; favorites=[||] }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
     
   let registerUserNewUser dbClient = 
     request ( fun inputGraph -> 

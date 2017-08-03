@@ -13,6 +13,7 @@ module Convert =
                 token = "";
                 bio = "";
                 image = "";
+                favorites=[||];
             };
       Id = BsonObjectId.Empty
     }
