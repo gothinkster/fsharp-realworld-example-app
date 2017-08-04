@@ -13,6 +13,7 @@ open RealWorld.Effects.DB
 open RealWorld.Effects.Actions
 open MongoDB.Bson
 
+
 let serverConfig = 
   let randomPort = Random().Next(7000, 7999)
   { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" randomPort] }
@@ -21,6 +22,7 @@ let validateCredentials dbClient =
   request (fun inputGraph -> 
     let user = Suave.Json.fromJson<UserRequest> inputGraph.rawForm |> loginUser dbClient
     Successful.OK (sprintf "%A" inputGraph)
+    
   )
 
 let extractStringQueryVal (queryParameters : HttpRequest) name =
@@ -70,8 +72,8 @@ let app (dbClient: IMongoDatabase) =
     POST >=> pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))  
     GET  >=> pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
     DELETE >=> pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)
-    POST >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
-    DELETE >=> path "/articles/:slug/favorite" >=> (Successful.OK Responses.singleArticle)
+    POST >=> pathScan "/articles/%s/favorite" (fun slug -> favoriteArticle slug dbClient) 
+    DELETE >=> pathScan "/articles/%s/favorite" (fun slug -> removeFavoriteCurrentUser slug dbClient) 
     POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle dbClient)) // Creates a new article
     GET >=> path "/tags" >=> getTagList dbClient
     path "/" >=> (Successful.OK "This will return the base page.")

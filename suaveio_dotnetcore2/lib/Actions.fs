@@ -106,3 +106,11 @@ module Actions =
     deleteWithCommentId id dbCLient
     |> jsonToString
     |> Successful.OK
+
+  let favoriteArticle slug dbClient = 
+    // TODO: Get the current user, then get the article by the slug and add the object id to the users favorite list
+    Successful.OK ""
+
+  let removeFavoriteCurrentUser slug dbClient = 
+    // TODO: Do the same thing as above except remove them from the favorite list
+    Successful.OK ""

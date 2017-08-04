@@ -11,6 +11,7 @@
     <Compile Include="lib/Effects.fs" />
     <Compile Include="lib/Stubs.fs" />
     <Compile Include="lib/Actions.fs" />
+    <Compile Include="lib/Hash.fs" />
     <Compile Include="Program.fs" />
      
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
