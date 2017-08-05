@@ -28,14 +28,14 @@ module Convert =
 
   let defaultArticle =
     { 
-      Id=(BsonObjectId(ObjectId.GenerateNewId()));
+      Id=ObjectId.GenerateNewId();
       article = 
       { slug = ""; 
         title = ""; 
         description = ""; 
         body = ""; 
-        createdAt = ""; 
-        updatedAt = ""; 
+        createdAt = System.DateTime.Now; 
+        updatedAt = System.DateTime.Now; 
         favorited = false; 
         favoritesCount = 0u; 
         author = defaultProfile; 
