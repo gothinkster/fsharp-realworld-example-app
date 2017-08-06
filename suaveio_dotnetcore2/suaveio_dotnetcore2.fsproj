@@ -1,24 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="lib/Models.fs" />
+    <Compile Include="lib/Json.fs" />
+    <Compile Include="lib/JsonWebToken.fs" />
+    <Compile Include="lib/Auth.fs" />
     <Compile Include="lib/Convert.fs" />
     <Compile Include="lib/Effects.fs" />
     <Compile Include="lib/Stubs.fs" />
     <Compile Include="lib/Actions.fs" />
     <Compile Include="lib/Hash.fs" />
     <Compile Include="Program.fs" />
-     
+    <PackageReference Include="Fable.JsonConverter" Version="1.0.1" />
+    <PackageReference Include="jose-jwt" Version="2.4.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="Suave" Version="2.1.0" />
     <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.0-preview2-final" />
-    
   </ItemGroup>
-
 </Project>
