@@ -1,8 +1,5 @@
 module RealWorld.JsonWebToken
 
-//  Learn about JWT https://jwt.io/introduction/
-//  This module uses the JOSE-JWT library https://github.com/dvsekhvalnov/jose-jwt
-
 open System.IO
 open System.Text
 open Newtonsoft.Json
@@ -19,13 +16,7 @@ let private createPassPhrase() =
 
 let private passPhrase =
     let encoding = Encoding.UTF8
-    let fi = FileInfo("./temp/token.txt")
-    if not fi.Exists then
-        let passPhrase = createPassPhrase()
-        if not fi.Directory.Exists then
-            fi.Directory.Create()
-        File.WriteAllBytes(fi.FullName,passPhrase)
-    File.ReadAllBytes(fi.FullName)
+    RealWorld.Effects.DB.getPassPhrase () |> System.Text.Encoding.ASCII.GetBytes
 
 let private encodeString (payload:string) =
     Jose.JWT.Encode(payload, passPhrase, Jose.JweAlgorithm.A256KW, Jose.JweEncryption.A256CBC_HS512)

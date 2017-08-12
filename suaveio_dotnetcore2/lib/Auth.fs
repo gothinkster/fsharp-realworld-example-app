@@ -3,6 +3,9 @@ module RealWorld.Auth
 
 open Suave
 open Suave.RequestErrors
+open MongoDB.Driver
+open RealWorld.Models
+open RealWorld.Effects
 
 type Login = {
   UserName: string;
@@ -30,6 +33,31 @@ let login (ctx: HttpContext) = async {
         return! Successful.OK token ctx
     with
     | _ -> return! UNAUTHORIZED (sprintf "User '%s' can't be logged in." login.UserName) ctx
+}
+
+let validatePassword (savedPassword: UserDetails option) passedInPassword = 
+  match savedPassword with
+  | Some password -> RealWorld.Hash.Crypto.verify password.PasswordHash passedInPassword
+  | None _ -> false
+
+let loginWithCredentials dbClient (ctx: HttpContext) = async {
+  let login = 
+        ctx.request.rawForm 
+        |> System.Text.Encoding.UTF8.GetString
+        |> RealWorld.Json.ofJson<Login>
+
+  try
+      let checkedPassword = RealWorld.Effects.DB.loginUser dbClient login.UserName
+      
+      if not (validatePassword checkedPassword login.Password) then
+          return! failwithf "Could not authenticate %s" login.UserName
+      
+      //let user : JsonWebToken.UserRights = { UserName = login.UserName }
+      let token = JsonWebToken.encode checkedPassword.Value
+      
+      return! Successful.OK token ctx
+  with
+  | _ -> return! UNAUTHORIZED (sprintf "User '%s' can't be logged in." login.UserName) ctx
 }
 
 /// Invokes a function that produces the output for a web part if the HttpContext

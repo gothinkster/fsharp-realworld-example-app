@@ -14,7 +14,11 @@ module DB =
 
   let getConfigDbConnection currentDir = 
     let builder = ConfigurationBuilder().SetBasePath(currentDir).AddJsonFile("appsettings.json")
+    
     builder.Build()
+
+  let getPassPhrase () =
+    (getConfigDbConnection currentDir).GetValue<string>("jwtPassPhrase")
     
   let getSavedTagList (dbClient : IMongoDatabase) =
     let collection = dbClient.GetCollection<TagCloud>("Tags")
@@ -23,10 +27,11 @@ module DB =
  
   let getSavedArticles (dbClient : IMongoDatabase) =
     // TODO: Add sort by date desc to query
-    let collection = dbClient.GetCollection<Article>("Article")
-    let articleList = collection.AsQueryable()
-                                .OrderByDescending(fun art -> art.article.createdAt)
-                                .ToList() |> List.ofSeq
+    let collection = dbClient.GetCollection<BsonDocument>("Article")
+    let articleList = collection.Find(Builders<BsonDocument>.Filter.Empty)
+                                .ToList()
+                                |> List.ofSeq
+                                
     if not (List.isEmpty articleList) then Some (articleList) else None
 
   let getSavedFollowedArticles (dbClient : IMongoDatabase) = 
@@ -38,17 +43,23 @@ module DB =
     if not (List.isEmpty articleList) then Some (articleList) else None
 
   let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 
+    let profileDetails = BsonDocument([
+                                        BsonElement("username", BsonValue.Create article.article.author.username);
+                                        BsonElement("bio", BsonValue.Create article.article.author.bio);
+                                        BsonElement("image", BsonValue.Create article.article.author.image);
+                                        BsonElement("following", BsonValue.Create article.article.author.following);
+                                      ])
     let articleDetails = BsonDocument([
                                         BsonElement("slug", BsonValue.Create article.article.slug);
                                         BsonElement("title", BsonValue.Create article.article.title);
                                         BsonElement("description", BsonValue.Create article.article.description);
                                         BsonElement("body", BsonValue.Create article.article.body);
-                                        BsonElement("createdat", BsonValue.Create article.article.createdAt);
-                                        BsonElement("updateat", BsonValue.Create article.article.updatedAt);
+                                        BsonElement("createdAt", BsonValue.Create article.article.createdAt);
+                                        BsonElement("updatedAt", BsonValue.Create article.article.updatedAt);
                                         BsonElement("favorited", BsonValue.Create article.article.favorited);
                                         BsonElement("favoritesCount", BsonValue.Create article.article.favoritesCount);
-                                        BsonElement("author", BsonValue.Create article.article.author);
-                                        BsonElement("tagList", BsonValue.Create [||]);
+                                        BsonElement("author", BsonValue.Create profileDetails);
+                                        BsonElement("tagList", BsonValue.Create article.article.tagList);
                                       ])
     let bsonArticle = BsonDocument([
                                       BsonElement("article", BsonValue.Create articleDetails)
@@ -81,7 +92,8 @@ module DB =
                                   BsonElement("_id" , BsonObjectId(ObjectId.GenerateNewId()) );
                                   BsonElement("user", details)
                                 ])
-    let collection = dbClient.GetCollection<BsonDocument>("Users")
+   
+    let collection = dbClient.GetCollection<BsonDocument>("Users")    
     collection.InsertOne bsonUser
     request
 
@@ -118,14 +130,9 @@ module DB =
     let collection = dbClient.GetCollection<User>("Users")
     collection.InsertOne(newUser)
 
-  let loginUser (dbClient: IMongoDatabase) (request: UserRequest)  = 
+  let loginUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection<UserDetails>("Users")
-
-    // TODO: Finish JWT authentication; Below is an example of how to use filters for mongo
-    //let passwordFilter = Builders.Filter.Eq((fun doc -> doc.Password), request.Password)
-    let usernameFilter = Builders.Filter.Eq((fun doc -> doc.email), request.user.email)
-    //let filter = Builders.Filter.And(passwordFilter, usernameFilter)
-    // Return collections to avoid leaking nulls into your program from C#.
+    let usernameFilter = Builders.Filter.Eq((fun doc -> doc.email), userName)
     collection.Find(usernameFilter).ToList() |> Seq.first
 
   let articleFilter slug = Builders.Filter.Eq((fun article -> article.article.slug), slug)

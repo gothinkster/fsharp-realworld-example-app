@@ -12,6 +12,7 @@ open MongoDB.Bson.Serialization
 open MongoDB.Driver.Linq
 open MongoDB.Driver
 open RealWorld.Models
+open RealWorld.Convert
 
 type SubArticle = {
   Id: string;
@@ -22,18 +23,11 @@ type SubArticle = {
 let tests = 
   testList "Integration" [
     testCase "Current working test for trying out impure functions" <| fun _ ->
-      
-      let printDetails (docFragment : BsonValue) = 
-        printfn "Fragment: %A" (docFragment.AsBsonDocument.GetValue("slug"))
-        "doc"
+      getArticleBySlug databaseClient "just-inserted" |> printfn "Article: %A"
+      Expect.equal true true String.Empty
 
-      let collection = databaseClient.GetCollection<BsonDocument> "Article"
-      let documentList = collection.Find(Builders<BsonDocument>.Filter.Empty)
-      let mapToArticle (doc:BsonDocument) = 
-        { Id = doc.GetValue("_id").ToString(); details = printDetails (doc.GetElement("article").Value) }
-      let serializedArticles = documentList.ToList() 
-                                |> List.ofSeq 
-                                |> List.map mapToArticle     
-      printfn "Document list: %A" (serializedArticles)
+    testCase "Getting articles" <| fun _ -> 
+      //let newArticle = { defaultArticle with article = { defaultArticle.article with slug = "just-inserted"} }
+      //insertNewArticle newArticle databaseClient |> ignore
       Expect.equal true true String.Empty
   ]

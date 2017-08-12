@@ -28,7 +28,7 @@ module Convert =
 
   let defaultArticle =
     { 
-      Id=ObjectId.GenerateNewId();
+      Id= ObjectId.GenerateNewId();
       article = 
       { slug = ""; 
         title = ""; 
@@ -39,7 +39,7 @@ module Convert =
         favorited = false; 
         favoritesCount = 0u; 
         author = defaultProfile; 
-        taglist = [||]  }
+        tagList = [|"test"|]  }
     }
 
   let extractArticleList (result) =

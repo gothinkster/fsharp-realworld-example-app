@@ -6,10 +6,31 @@ module Actions =
   open DB
   open MongoDB.Bson
   open System.Text
+  open System
   let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
   let fakeReply email = 
     {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; favorites=[||] }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
+
+  let extractStringQueryVal (queryParameters : HttpRequest) name =
+    match queryParameters.queryParam name with
+    | Choice1Of2 queryVal -> queryVal
+    | Choice2Of2 _ -> String.Empty
+
+  let extractNumericQueryVal (queryParameters : HttpRequest) name =
+    match queryParameters.queryParam name with
+    | Choice1Of2 limit -> Convert.ToInt32 limit
+    | Choice2Of2 _ -> 0
+    
+  let routeByOptions (queryParameters : HttpRequest) =
+    let listArticleOptions = {
+      Limit = extractNumericQueryVal queryParameters "limit";
+      Tag = extractStringQueryVal queryParameters "tag";
+      Author = extractStringQueryVal queryParameters "author";
+      Favorited = extractStringQueryVal queryParameters "favorited";
+      Offset = extractNumericQueryVal queryParameters "offset";
+    }
+    (Successful.OK "")
     
   let registerUserNewUser dbClient = 
     request ( fun inputGraph -> 
@@ -68,7 +89,7 @@ module Actions =
   (* TODO: Look into consolidating these functions since they are close in functionality *)
   let getArticles dbClient = 
     getSavedArticles dbClient
-    |> defaultArticleIfEmpty
+    |> RealWorld.BsonDocConverter.toArticleList
     |> jsonToString
     |> Successful.OK
 

@@ -40,7 +40,7 @@ module Responses =
                   favorited = false;
                   favoritesCount = 2u;
                   author = getFakeAuthor;
-                  taglist = [|"programming"|]
+                  tagList = [|"programming"|]
                 }
     } |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
 
@@ -85,7 +85,7 @@ module Responses =
         favorited = false;
         favoritesCount = 2u;
         author = getFakeAuthor;
-        taglist = [|"functional"|]
+        tagList = [|"functional"|]
       };
       {
         slug = "what was said before";
@@ -97,7 +97,7 @@ module Responses =
         favorited = false;
         favoritesCount = 2u;
         author = getFakeAuthor;
-        taglist = [|"Rust"|]
+        tagList = [|"Rust"|]
       }
     |]
 

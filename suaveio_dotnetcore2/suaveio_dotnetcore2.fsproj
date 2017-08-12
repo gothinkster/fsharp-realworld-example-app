@@ -6,13 +6,14 @@
   <ItemGroup>
     <Compile Include="lib/Models.fs" />
     <Compile Include="lib/Json.fs" />
-    <Compile Include="lib/JsonWebToken.fs" />
-    <Compile Include="lib/Auth.fs" />
     <Compile Include="lib/Convert.fs" />
+    <Compile Include="lib/BsonDocConverter.fs" />
     <Compile Include="lib/Effects.fs" />
+    <Compile Include="lib/JsonWebToken.fs" />
+    <Compile Include="lib/Hash.fs" />
+    <Compile Include="lib/Auth.fs" />
     <Compile Include="lib/Stubs.fs" />
     <Compile Include="lib/Actions.fs" />
-    <Compile Include="lib/Hash.fs" />
     <Compile Include="Program.fs" />
     <PackageReference Include="Fable.JsonConverter" Version="1.0.1" />
     <PackageReference Include="jose-jwt" Version="2.4.0" />

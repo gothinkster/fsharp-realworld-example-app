@@ -18,37 +18,7 @@ let serverConfig =
   let randomPort = Random().Next(7000, 7999)
   { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" randomPort] }
 
-let validateCredentials dbClient = 
-  request (fun inputGraph -> 
-    let user = Suave.Json.fromJson<UserRequest> inputGraph.rawForm |> loginUser dbClient
-    Successful.OK (sprintf "%A" inputGraph)
-    
-  )
-
-let extractStringQueryVal (queryParameters : HttpRequest) name =
-  match queryParameters.queryParam name with
-  | Choice1Of2 queryVal -> queryVal
-  | Choice2Of2 _ -> String.Empty
-
-let extractNumericQueryVal (queryParameters : HttpRequest) name =
-  match queryParameters.queryParam name with
-  | Choice1Of2 limit -> Convert.ToInt32 limit
-  | Choice2Of2 _ -> 0
-  
-let routeByOptions (queryParameters : HttpRequest) =
-  let listArticleOptions = {
-    Limit = extractNumericQueryVal queryParameters "limit";
-    Tag = extractStringQueryVal queryParameters "tag";
-    Author = extractStringQueryVal queryParameters "author";
-    Favorited = extractStringQueryVal queryParameters "favorited";
-    Offset = extractNumericQueryVal queryParameters "offset";
-  } 
-
-  // TODO: pass the options to mongo to filter properly
-  (Successful.OK "successful")
-
-let initProfile = 
-  {username = ""; bio = ""; image = ""; following = false;}
+let validateCredentials dbClient = RealWorld.Auth.loginWithCredentials dbClient
 
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient

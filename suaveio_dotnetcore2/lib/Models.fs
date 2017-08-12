@@ -51,7 +51,7 @@ namespace RealWorld
       favorited      : bool;
       favoritesCount : uint32;
       author         : ProfileDetails;
-      taglist        : string array
+      tagList        : string array
     }
 
     type Article = {
