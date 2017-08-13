@@ -7,7 +7,12 @@ module Actions =
   open MongoDB.Bson
   open System.Text
   open System
-  let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
+
+  //let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
+  let jsonToString (json: 'a) = 
+    let outputString = Newtonsoft.Json.JsonConvert.SerializeObject(json)
+    //printfn "Output: %A" outputString
+    outputString
 
   let fakeReply email = 
     {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; favorites=[||] }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
@@ -17,7 +22,7 @@ module Actions =
     | Choice1Of2 queryVal -> queryVal
     | Choice2Of2 _ -> String.Empty
 
-  let extractNumericQueryVal (queryParameters : HttpRequest) name =
+  let extractNumericQueryVal (queryParameters : HttpRequest) name = 
     match queryParameters.queryParam name with
     | Choice1Of2 limit -> Convert.ToInt32 limit
     | Choice2Of2 _ -> 0
@@ -32,9 +37,13 @@ module Actions =
     }
     (Successful.OK "")
     
-  let registerUserNewUser dbClient = 
+  let hashPassword (request: UserRequest) = 
+    {request with user = { request.user with hash = RealWorld.Hash.Crypto.fastHash request.user.password } }
+
+  let registerNewUser dbClient = 
     request ( fun inputGraph -> 
       Suave.Json.fromJson<UserRequest> inputGraph.rawForm
+      |> hashPassword
       |> registerWithBson dbClient 
       |> RealWorld.Convert.userRequestToUser 
       |> jsonToString 

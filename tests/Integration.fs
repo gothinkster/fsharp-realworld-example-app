@@ -14,20 +14,25 @@ open MongoDB.Driver
 open RealWorld.Models
 open RealWorld.Convert
 
-type SubArticle = {
-  Id: string;
-  details: string;
-}
-
 [<Tests>]
 let tests = 
   testList "Integration" [
     testCase "Current working test for trying out impure functions" <| fun _ ->
-      getArticleBySlug databaseClient "just-inserted" |> printfn "Article: %A"
+      //getArticleBySlug databaseClient "just-inserted" |> printfn "Article: %A"
       Expect.equal true true String.Empty
 
     testCase "Getting articles" <| fun _ -> 
       //let newArticle = { defaultArticle with article = { defaultArticle.article with slug = "just-inserted"} }
       //insertNewArticle newArticle databaseClient |> ignore
+
+      let getArticleList = function
+      | Some art -> art
+      | _ -> []
+      let bsonToArticle (doc:BsonDocument) =
+        MongoDB.Bson.Serialization.BsonSerializer.Deserialize<Article>(doc) 
+
+      let result = getSavedArticles databaseClient |>  getArticleList 
+      printfn "Result: %A" (List.map bsonToArticle result)  
+
       Expect.equal true true String.Empty
   ]

@@ -2,11 +2,13 @@ namespace RealWorld
 
   module Models =
     open MongoDB.Bson
+    open MongoDB.Bson.Serialization.Attributes
 
     type UserRequestDetails = {
       username : string;
       email : string;
       password : string;
+      hash : string;
     }
 
     type UserRequest = {
@@ -56,7 +58,9 @@ namespace RealWorld
 
     type Article = {
       article : ArticleDetails;
-      Id      : ObjectId;
+      [<BsonId>]
+      [<BsonRepresentation(BsonType.ObjectId)>]
+      Id      : string;
     }  
 
     type Articles = {
@@ -108,3 +112,6 @@ namespace RealWorld
       Favorited : string;
       Offset : int;
     }
+
+    [<Literal>]
+    let usernameField = "username"

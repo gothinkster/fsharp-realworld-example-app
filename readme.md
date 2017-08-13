@@ -1,6 +1,6 @@
 # ![RealWorld Example App](logo.png)
 
-> ### RealWorld Fsharp (Suave/AspMVC + Mongo) codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
+> ### RealWorld Fsharp (Suave + Mongo) codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
 
 # Installation
 
@@ -12,7 +12,7 @@
 
 # How it works
 
-> The Suave/Aspnet applications are divided up into 2 sectors, pure functions and "effectful" functions. All of the "effectful" functions are contained in the effects namespace. These functions in this namespace are in charge of communicating with the database. 
+> The Suave application are divided up into 2 sectors, pure functions and "effectful" functions. All of the "effectful" functions are contained in the effects namespace. These functions in this namespace are in charge of communicating with the database. 
 
 # Getting started
 

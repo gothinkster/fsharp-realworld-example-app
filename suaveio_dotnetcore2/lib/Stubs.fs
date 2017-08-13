@@ -29,7 +29,7 @@ module Responses =
 
   let singleArticle = 
     {
-      Id=ObjectId.GenerateNewId();
+      Id=ObjectId.GenerateNewId().ToString();
       article = {
                   slug = "";
                   title = "This is a new test title";

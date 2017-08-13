@@ -6,7 +6,7 @@ module BsonDocConverter =
   open RealWorld.Models
 
   let bsonToProfile (doc: BsonDocument) = {
-    username = doc.GetValue("username").AsString;
+    username = doc.GetValue(usernameField).AsString;
     bio = doc.GetValue("bio").AsString;
     image = doc.GetValue("image").AsString;
     following = doc.GetValue("following").AsBoolean;
@@ -25,10 +25,13 @@ module BsonDocConverter =
     tagList = Array.empty<string>;
   }
 
+  let serializeBsonToArticle (doc:BsonDocument) =
+    // This can't be used because it doesn't serialize the Id correctly
+    MongoDB.Bson.Serialization.BsonSerializer.Deserialize<Article>(doc) 
+
   let toArticleList (docs:BsonDocument list option) = 
-    let bsonToArticle (doc: BsonDocument) =
-      { Id = doc.GetValue("_id").AsObjectId; article = bsonToArticleDetails (doc.GetValue("article").AsBsonDocument) }
+    // let bsonToArticle (doc: BsonDocument) =
+    //   { Id = doc.GetValue("_id").AsString; article = bsonToArticleDetails (doc.GetValue("article").AsBsonDocument) }
     match docs with
-    | Some bdoc -> List.map bsonToArticle bdoc |> List.toArray
-    | _ -> Array.empty<Article>
-    
+    | Some bdoc -> List.map serializeBsonToArticle bdoc |> List.toArray
+    | _ -> [||]

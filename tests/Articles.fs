@@ -48,7 +48,7 @@ let tests =
       Expect.equal article.article.slug "inception-movie" "Did not transform bson doc correctly"
 
     testCase "serialize bdoc" <| fun _ -> 
-      MongoDB.Bson.Serialization.BsonSerializer.Deserialize<Article>(samepleBdoc ()) |> printfn "doc: %A"
+      //MongoDB.Bson.Serialization.BsonSerializer.Deserialize<Article>(samepleBdoc ()) |> printfn "doc: %A"
       Expect.equal true true ""
   ]
 

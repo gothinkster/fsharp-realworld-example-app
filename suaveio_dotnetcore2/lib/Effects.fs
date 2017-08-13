@@ -89,7 +89,6 @@ module DB =
                                   BsonElement("passwordhash", BsonValue.Create "");
                                 ])
     let bsonUser = BsonDocument ([
-                                  BsonElement("_id" , BsonObjectId(ObjectId.GenerateNewId()) );
                                   BsonElement("user", details)
                                 ])
    

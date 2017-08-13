@@ -27,7 +27,7 @@ let mapJsonToArticle (article : Article) dbClient =
 let app (dbClient: IMongoDatabase) = 
   choose [
     POST >=> path "/users/login" >=> validateCredentials dbClient
-    POST >=> path "/users" >=> registerUserNewUser dbClient
+    POST >=> path "/users" >=> registerNewUser dbClient
     GET  >=> path "/user" >=> getCurrentUser dbClient
     PUT  >=> path "/user" >=> updateUser dbClient
     GET  >=> pathScan "/profile/%s" (fun username -> getUserProfile dbClient username)
