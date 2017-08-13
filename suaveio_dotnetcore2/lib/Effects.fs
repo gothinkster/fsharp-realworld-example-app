@@ -14,7 +14,6 @@ module DB =
 
   let getConfigDbConnection currentDir = 
     let builder = ConfigurationBuilder().SetBasePath(currentDir).AddJsonFile("appsettings.json")
-    
     builder.Build()
 
   let getPassPhrase () =
