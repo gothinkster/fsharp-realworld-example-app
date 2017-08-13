@@ -15,7 +15,7 @@ module Convert =
                 image = "";
                 favorites=[||];
             };
-      Id = BsonObjectId.Empty
+      Id = "";
     }
   
   let updateUser (user:UserDetails) (result : UpdateResult option) : string  =

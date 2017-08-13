@@ -27,7 +27,9 @@ namespace RealWorld
 
     type User = {
       user : UserDetails;
-      Id : BsonObjectId;
+      [<BsonId>]
+      [<BsonRepresentation(BsonType.ObjectId)>]
+      Id : string;
     }
 
     type ProfileDetails = {

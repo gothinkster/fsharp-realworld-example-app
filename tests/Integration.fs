@@ -22,17 +22,6 @@ let tests =
       Expect.equal true true String.Empty
 
     testCase "Getting articles" <| fun _ -> 
-      //let newArticle = { defaultArticle with article = { defaultArticle.article with slug = "just-inserted"} }
-      //insertNewArticle newArticle databaseClient |> ignore
-
-      let getArticleList = function
-      | Some art -> art
-      | _ -> []
-      let bsonToArticle (doc:BsonDocument) =
-        MongoDB.Bson.Serialization.BsonSerializer.Deserialize<Article>(doc) 
-
-      let result = getSavedArticles databaseClient |>  getArticleList 
-      printfn "Result: %A" (List.map bsonToArticle result)  
-
+      RealWorld.Hash.Crypto.fastHash "test" |> printfn "Password hash: %A"
       Expect.equal true true String.Empty
   ]

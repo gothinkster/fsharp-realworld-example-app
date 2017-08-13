@@ -86,7 +86,7 @@ module DB =
                                   BsonElement("token", BsonValue.Create "");
                                   BsonElement("bio", BsonValue.Create "");
                                   BsonElement("image", BsonValue.Create "");
-                                  BsonElement("passwordhash", BsonValue.Create "");
+                                  BsonElement("passwordhash", BsonValue.Create request.user.hash);
                                 ])
     let bsonUser = BsonDocument ([
                                   BsonElement("user", details)
@@ -110,24 +110,6 @@ module DB =
                                     .Set((fun doc -> doc.user.username), request.username)
                
     Some (collection.UpdateOne(requestedUser, updateUser))
-    
-  let registerNewUser (dbClient:IMongoDatabase) (request: UserRequest) = 
-    // TODO: Create hash for password
-    // TODO: Check if the user already exist
-    let newUser = {
-      Id = BsonObjectId(ObjectId.GenerateNewId());
-      user = {
-                username = request.user.username;
-                email = request.user.email;
-                token = "";
-                bio = "";
-                image = "";
-                PasswordHash = "";
-                favorites = [||];
-      }
-    }
-    let collection = dbClient.GetCollection<User>("Users")
-    collection.InsertOne(newUser)
 
   let loginUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection<UserDetails>("Users")

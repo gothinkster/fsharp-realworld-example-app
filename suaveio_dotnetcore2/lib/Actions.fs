@@ -8,14 +8,12 @@ module Actions =
   open System.Text
   open System
 
-  //let jsonToString (json: 'a) = json |> Suave.Json.toJson |> System.Text.Encoding.UTF8.GetString
   let jsonToString (json: 'a) = 
-    let outputString = Newtonsoft.Json.JsonConvert.SerializeObject(json)
-    //printfn "Output: %A" outputString
-    outputString
+    Newtonsoft.Json.JsonConvert.SerializeObject(json)
+    
 
   let fakeReply email = 
-    {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; favorites=[||] }; Id=(BsonObjectId(ObjectId.GenerateNewId()))  }
+    {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; favorites=[||] }; Id=ObjectId.GenerateNewId().ToString()  }
 
   let extractStringQueryVal (queryParameters : HttpRequest) name =
     match queryParameters.queryParam name with
@@ -42,7 +40,8 @@ module Actions =
 
   let registerNewUser dbClient = 
     request ( fun inputGraph -> 
-      Suave.Json.fromJson<UserRequest> inputGraph.rawForm
+      //Suave.Json.fromJson<UserRequest> inputGraph.rawForm
+      Newtonsoft.Json.JsonConvert.DeserializeObject<UserRequest>(inputGraph.rawForm |> System.Text.ASCIIEncoding.UTF8.GetString)
       |> hashPassword
       |> registerWithBson dbClient 
       |> RealWorld.Convert.userRequestToUser 
