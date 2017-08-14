@@ -111,13 +111,14 @@ module DB =
     Some (collection.UpdateOne(requestedUser, updateUser))
 
   let loginUser (dbClient: IMongoDatabase) (userName: string)  = 
-    let collection = dbClient.GetCollection<UserDetails>("Users")
-    let usernameFilter = Builders.Filter.Eq((fun doc -> doc.email), userName)
-    collection.Find(usernameFilter).ToList() |> Seq.first
+    let collection = dbClient.GetCollection "Users"
+    //let filter = FilterDefinition<BsonDocument>.op_Implicit("{ \"user.email\": \"jake@jake.jake\"}")
+    let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)
+    collection.Find(filter).ToList() |> Seq.first
 
   let articleFilter slug = Builders.Filter.Eq((fun article -> article.article.slug), slug)
 
-  let getArticleBySlug (dbClient: IMongoDatabase) slug = 
+  let getArticleBySlug (dbClient: IMongoDatabase) slug =  
     let collection = dbClient.GetCollection<Article>("Article")
     collection.Find(articleFilter slug).ToList() |> Seq.first
 

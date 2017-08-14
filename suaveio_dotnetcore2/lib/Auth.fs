@@ -6,6 +6,7 @@ open Suave.RequestErrors
 open MongoDB.Driver
 open RealWorld.Models
 open RealWorld.Effects
+open BsonDocConverter
 
 type Login = {
   UserName: string;
@@ -48,14 +49,17 @@ let loginWithCredentials dbClient (ctx: HttpContext) = async {
 
   try
       let checkedPassword = RealWorld.Effects.DB.loginUser dbClient login.UserName
-      
-      if not (validatePassword checkedPassword login.Password) then
-          return! failwithf "Could not authenticate %s" login.UserName
-      
-      //let user : JsonWebToken.UserRights = { UserName = login.UserName }
-      let token = JsonWebToken.encode checkedPassword.Value
-      
-      return! Successful.OK token ctx
+      match checkedPassword with
+      | Some pass -> 
+        if not (validatePassword (Some(toUserDetail pass)) login.Password) then
+            return! failwithf "Could not authenticate %s" login.UserName
+        
+        let user : JsonWebToken.UserRights = { UserName = login.UserName }
+        let token = JsonWebToken.encode checkedPassword.Value
+        
+        return! Successful.OK token ctx
+      | None -> 
+        return! failwithf "Could not authenticate %s" login.UserName
   with
   | _ -> return! UNAUTHORIZED (sprintf "User '%s' can't be logged in." login.UserName) ctx
 }
