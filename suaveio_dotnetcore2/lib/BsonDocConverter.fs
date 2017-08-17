@@ -14,7 +14,17 @@ module BsonDocConverter =
     | Some bdoc -> List.map serializeBsonTo<Article> bdoc |> List.toArray
     | _ -> [||]
 
-  let toUser (bdocUser: BsonDocument) = serializeBsonTo<User> bdocUser
+  let toUserDetail (bdoc: BsonDocument) = { 
+      username = bdoc.GetElement("username").Value.ToString()
+      email = bdoc.GetElement("email").Value.ToString()
+      token = bdoc.GetElement("passwordhash").Value.ToString()
+      bio = bdoc.GetElement("bio").Value.ToString()
+      image = bdoc.GetElement("image").Value.ToString() 
+    }
+
+  let toUser (bdocUser: BsonDocument) = 
+    printfn "Doc: %A" (bdocUser.ToString())
+    { user = (toUserDetail (bdocUser.GetElement("user").Value.AsBsonDocument)) }
 
   let extractPasswordHash dboc = 
     let userToLogin = Seq.find (fun (user:BsonElement) -> user.Name = "user") dboc

@@ -33,7 +33,7 @@ let loginWithCredentials dbClient (ctx: HttpContext) = async {
         |> deserializeToLogin
   
   try
-      let checkedPassword = RealWorld.Effects.DB.loginUser dbClient login.user.email
+      let checkedPassword = RealWorld.Effects.DB.getUser dbClient login.user.email
       match checkedPassword with
       | Some pass -> 
         let passHash = extractPasswordHash pass

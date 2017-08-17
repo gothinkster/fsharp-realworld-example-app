@@ -51,12 +51,17 @@ module Actions =
 
   let getCurrentUser dbClient httpContext = 
     Auth.useToken httpContext (fun token -> async {
-      try
-        printfn "Token: %A" token
-        // Use the username to get the user from the database
-        return! Successful.OK token.UserName httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+      // try
+        
+        
+        let currentUser = 
+          (getUser dbClient token.UserName).Value
+          |> BsonDocConverter.toUser
+          |> jsonToString
+
+        return! Successful.OK currentUser httpContext
+      // with ex ->
+      //   return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
 
   let updateUser dbClient = 

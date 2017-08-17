@@ -95,11 +95,6 @@ module DB =
     collection.InsertOne bsonUser
     request
 
-  let getCurrentUser (dbClient: IMongoDatabase) request = 
-    // TODO: Create handle to grab the current user
-    (* TODO: Implement after adding the authentication lib *)
-    None
-
   let updateRequestedUser (dbClient : IMongoDatabase) (request : UserDetails) = 
     let collection = dbClient.GetCollection<User> "Users"
     
@@ -110,7 +105,7 @@ module DB =
                
     Some (collection.UpdateOne(requestedUser, updateUser))
 
-  let loginUser (dbClient: IMongoDatabase) (userName: string)  = 
+  let getUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection "Users"
     let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)
     let results = collection.Find(filter).ToListAsync()

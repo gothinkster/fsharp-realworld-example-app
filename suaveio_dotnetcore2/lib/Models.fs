@@ -14,6 +14,18 @@ namespace RealWorld
     type UserRequest = {
       user : UserRequestDetails;
     }
+
+    type AuthenticatedUserDetails = {
+      email: string;
+      token: string;
+      username: string;
+      bio: string;
+      image: string;
+    }
+
+    type AuthenticatedUser = {
+      user : AuthenticatedUserDetails;
+    }
     
     type UserDetails = {
       email : string;
