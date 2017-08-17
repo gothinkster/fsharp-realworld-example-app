@@ -13,15 +13,14 @@ open MongoDB.Driver.Linq
 open MongoDB.Driver
 open RealWorld.Models
 open RealWorld.Convert
+open Newtonsoft.Json
 
 [<Tests>]
 let tests = 
   testList "Integration" [
     testCase "Current working test for trying out impure functions" <| fun _ ->
-      // getArticleBySlug databaseClient "just-inserted" |> printfn "Article: %A"
       Expect.equal true true String.Empty
 
     testCase "Getting articles" <| fun _ -> 
-      // loginUser databaseClient "jake@jake.jake" |> printfn "Result: %A"
       Expect.equal true true String.Empty
   ]

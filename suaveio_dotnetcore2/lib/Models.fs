@@ -21,7 +21,7 @@ namespace RealWorld
       username : string;
       bio : string;
       image : string;
-      PasswordHash : string;
+      passwordhash : string;
       favorites : string array;
     }
 

@@ -7,61 +7,48 @@ open MongoDB.Driver
 open RealWorld.Models
 open RealWorld.Effects
 open BsonDocConverter
+open Newtonsoft.Json
+
+type LoginDetails = {
+  email: string;
+  password: string;
+}
 
 type Login = {
-  UserName: string;
-  Password: string;
+  user: LoginDetails;
 }
 
 let unauthorized s = Suave.Response.response HTTP_401 s
 
 let UNAUTHORIZED s = unauthorized (UTF8.bytes s)
 
-/// Login web part that authenticates a user and returns a token in the HTTP body.
-let login (ctx: HttpContext) = async {
-    let login = 
-        ctx.request.rawForm 
-        |> System.Text.Encoding.UTF8.GetString
-        |> RealWorld.Json.ofJson<Login>
-
-    try
-        if (login.UserName <> "test" || login.Password <> "test") && 
-           (login.UserName <> "test2" || login.Password <> "test2") then
-            return! failwithf "Could not authenticate %s" login.UserName
-        let user : JsonWebToken.UserRights = { UserName = "fill_in_later" }
-        let token = JsonWebToken.encode user
-
-        return! Successful.OK token ctx
-    with
-    | _ -> return! UNAUTHORIZED (sprintf "User '%s' can't be logged in." login.UserName) ctx
-}
-
-let validatePassword (savedPassword: UserDetails option) passedInPassword = 
-  match savedPassword with
-  | Some password -> RealWorld.Hash.Crypto.verify password.PasswordHash passedInPassword
-  | None _ -> false
-
+let validatePassword passwordHash passedInPassword = 
+  RealWorld.Hash.Crypto.verify passwordHash passedInPassword
+  
 let loginWithCredentials dbClient (ctx: HttpContext) = async {
+  let deserializeToLogin json = JsonConvert.DeserializeObject<Login>(json)
   let login = 
         ctx.request.rawForm 
         |> System.Text.Encoding.UTF8.GetString
-        |> RealWorld.Json.ofJson<Login>
-
+        |> deserializeToLogin
+  
   try
-      let checkedPassword = RealWorld.Effects.DB.loginUser dbClient login.UserName
+      let checkedPassword = RealWorld.Effects.DB.loginUser dbClient login.user.email
       match checkedPassword with
       | Some pass -> 
-        if not (validatePassword (Some(toUserDetail pass)) login.Password) then
-            return! failwithf "Could not authenticate %s" login.UserName
+        let passHash = extractPasswordHash pass
         
-        let user : JsonWebToken.UserRights = { UserName = login.UserName }
-        let token = JsonWebToken.encode checkedPassword.Value
+        if not (validatePassword passHash login.user.password) then    
+            return! failwithf "Could not authenticate %s" login.user.email
+        
+        let user : JsonWebToken.UserRights = { UserName = login.user.email }
+        let token = JsonWebToken.encode user
         
         return! Successful.OK token ctx
-      | None -> 
-        return! failwithf "Could not authenticate %s" login.UserName
+      | _ -> 
+        return! failwithf "Could not authenticate %s" login.user.email
   with
-  | _ -> return! UNAUTHORIZED (sprintf "User '%s' can't be logged in." login.UserName) ctx
+  | _ -> return! UNAUTHORIZED (sprintf "User '%s' can't be logged in." login.user.email) ctx
 }
 
 /// Invokes a function that produces the output for a web part if the HttpContext

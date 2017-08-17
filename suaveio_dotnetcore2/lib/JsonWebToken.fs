@@ -19,17 +19,21 @@ let private passPhrase =
     RealWorld.Effects.DB.getPassPhrase () |> System.Text.Encoding.ASCII.GetBytes
 
 let private encodeString (payload:string) =
-    Jose.JWT.Encode(payload, passPhrase, Jose.JweAlgorithm.A256KW, Jose.JweEncryption.A256CBC_HS512)
+    // To make this secure a key should generated and used as a pass phrase with the encoding below
+    // Jose.JWT.Encode(payload, passPhrase, Jose.JweAlgorithm.A256KW, Jose.JweEncryption.A256CBC_HS512)
+    Jose.JWT.Encode(payload, null, Jose.JwsAlgorithm.none)
 
 let private decodeString (jwt:string) =
-    Jose.JWT.Decode(jwt, passPhrase, Jose.JweAlgorithm.A256KW, Jose.JweEncryption.A256CBC_HS512)
+    // To make this secure a key should generated and used as a pass phrase with the encoding below
+    // Jose.JWT.Decode(jwt, passPhrase, Jose.JweAlgorithm.A256KW, Jose.JweEncryption.A256CBC_HS512)
+    Jose.JWT.Decode(jwt, null, Jose.JwsAlgorithm.none)
 
 let encode token =
     JsonConvert.SerializeObject token
     |> encodeString
 
 let decode<'a> (jwt:string) : 'a =
-    decodeString jwt
+    decodeString jwt 
     |> JsonConvert.DeserializeObject<'a>
 
 /// Returns true if the JSON Web Token is successfully decoded and the signature is verified.

@@ -15,4 +15,7 @@ module BsonDocConverter =
     | _ -> [||]
 
   let toUser (bdocUser: BsonDocument) = serializeBsonTo<User> bdocUser
-  let toUserDetail (bdocUser: BsonDocument) = (serializeBsonTo<User> bdocUser).user
+
+  let extractPasswordHash dboc = 
+    let userToLogin = Seq.find (fun (user:BsonElement) -> user.Name = "user") dboc
+    userToLogin.Value.AsBsonDocument.GetElement("passwordhash").Value.ToString()

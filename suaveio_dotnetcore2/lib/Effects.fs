@@ -112,9 +112,11 @@ module DB =
 
   let loginUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection "Users"
-    //let filter = FilterDefinition<BsonDocument>.op_Implicit("{ \"user.email\": \"jake@jake.jake\"}")
     let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)
-    collection.Find(filter).ToList() |> Seq.first
+    let results = collection.Find(filter).ToListAsync()
+                  |> Async.AwaitTask
+                  |> Async.RunSynchronously
+    if Seq.isEmpty results then None else (results |> Seq.first)
 
   let articleFilter slug = Builders.Filter.Eq((fun article -> article.article.slug), slug)
 

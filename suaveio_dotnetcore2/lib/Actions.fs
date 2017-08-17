@@ -7,13 +7,14 @@ module Actions =
   open MongoDB.Bson
   open System.Text
   open System
+  open RealWorld
+  open Suave.RequestErrors
 
   let jsonToString (json: 'a) = 
     Newtonsoft.Json.JsonConvert.SerializeObject(json)
-    
 
   let fakeReply email = 
-    {user = { email = email; token = ""; username=""; bio=""; image=""; PasswordHash=""; favorites=[||] }; Id=ObjectId.GenerateNewId().ToString()  }
+    {user = { email = email; token = ""; username=""; bio=""; image=""; passwordhash=""; favorites=[||] }; Id=ObjectId.GenerateNewId().ToString()  }
 
   let extractStringQueryVal (queryParameters : HttpRequest) name =
     match queryParameters.queryParam name with
@@ -40,7 +41,6 @@ module Actions =
 
   let registerNewUser dbClient = 
     request ( fun inputGraph -> 
-      //Suave.Json.fromJson<UserRequest> inputGraph.rawForm
       Newtonsoft.Json.JsonConvert.DeserializeObject<UserRequest>(inputGraph.rawForm |> System.Text.ASCIIEncoding.UTF8.GetString)
       |> hashPassword
       |> registerWithBson dbClient 
@@ -48,11 +48,16 @@ module Actions =
       |> jsonToString 
       |> Successful.OK
     )
-      
-  let getCurrentUser dbClient =
-    request (fun inputGraph ->
-      Successful.OK (fakeReply "" |> jsonToString)
-    )
+
+  let getCurrentUser dbClient httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try
+        printfn "Token: %A" token
+        // Use the username to get the user from the database
+        return! Successful.OK token.UserName httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
 
   let updateUser dbClient = 
     request (fun inputGraph ->
