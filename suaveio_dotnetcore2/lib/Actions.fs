@@ -9,6 +9,8 @@ module Actions =
   open System
   open RealWorld
   open Suave.RequestErrors
+  open Newtonsoft.Json
+  open RealWorld.Hash
 
   let jsonToString (json: 'a) = 
     Newtonsoft.Json.JsonConvert.SerializeObject(json)
@@ -49,31 +51,33 @@ module Actions =
       |> Successful.OK
     )
 
+  let currentUserByEmail dbClient email = 
+    (getUser dbClient email).Value
+    |> BsonDocConverter.toUser
+    |> jsonToString
+
   let getCurrentUser dbClient httpContext = 
     Auth.useToken httpContext (fun token -> async {
       try  
-        let currentUser = 
-          (getUser dbClient token.UserName).Value
-          |> BsonDocConverter.toUser
-          |> jsonToString
-
-        return! Successful.OK currentUser httpContext
+        return! Successful.OK (currentUserByEmail dbClient token.UserName) httpContext
       with ex ->
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
 
-  let updateUser dbClient = 
-    request (fun inputGraph ->
-      let userToUpdate = (Suave.Json.fromJson<User> inputGraph.rawForm).user
+  let updateUser dbClient  httpContext = 
+     Auth.useToken httpContext (fun token -> async {
+      try  
+        let user = JsonConvert.DeserializeObject<UserRequest>( httpContext.request.rawForm |> System.Text.ASCIIEncoding.UTF8.GetString)
+        
+        updateRequestedUser dbClient user |> ignore
 
-      userToUpdate
-      |> updateRequestedUser dbClient
-      |> RealWorld.Convert.updateUser userToUpdate
-      |> Successful.OK
-    )
+        return! Successful.OK (user |> jsonToString) httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
 
   open RealWorld.Stubs
-  let getUserProfile dbClient username = 
+  let getUserProfile dbClient username httpContext = 
     (Successful.OK Responses.singleProfile)
 
   let createNewArticle (articleToAdd : Article) dbCLient = 

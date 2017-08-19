@@ -19,6 +19,7 @@ let serverConfig =
   { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" randomPort] }
 
 let validateCredentials dbClient = RealWorld.Auth.loginWithCredentials dbClient
+let updateCurrentUser dbClient = updateUser dbClient
 
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient
@@ -29,9 +30,8 @@ let app (dbClient: IMongoDatabase) =
     POST >=> path "/users/login" >=> validateCredentials dbClient
     POST >=> path "/users" >=> registerNewUser dbClient
     GET  >=> path "/user" >=> getCurrentUser dbClient
-    PUT  >=> path "/user" >=> updateUser dbClient
+    PUT  >=> path "/user" >=> updateCurrentUser dbClient
     GET  >=> pathScan "/profile/%s" (fun username -> getUserProfile dbClient username)
-    // Come back to these when authentication gets implemented because it's needed to follow a user by their username
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     GET  >=> path "/articles" >=> getArticles dbClient

@@ -72,11 +72,7 @@ module DB =
     let mongoConn : string = (currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:DefaultConnection")
     let client = MongoClient(mongoConn)
     client.GetDatabase((currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:dbname"))
-
-  (* 
-    If we save docs using bson documents we won't have to create a separate record that can be passed around 
-    without the password hash or id
-  *)
+  
   let registerWithBson (dbClient: IMongoDatabase) (request: UserRequest) = 
     // TODO: Add the password hash
     let details = BsonDocument ([
@@ -95,16 +91,16 @@ module DB =
     collection.InsertOne bsonUser
     request
 
-  let updateRequestedUser (dbClient : IMongoDatabase) (request : UserDetails) = 
+  let updateRequestedUser (dbClient : IMongoDatabase) (request : UserRequest) = 
     let collection = dbClient.GetCollection<User> "Users"
     
-    let requestedUser = Builders.Filter.Eq((fun doc -> doc.user.email), request.email)
-    let updateUser = Builders.Update.Set((fun doc -> doc.user.bio), request.bio)
-                                    .Set((fun doc -> doc.user.image), request.image)
-                                    .Set((fun doc -> doc.user.username), request.username)
-               
+    let requestedUser = Builders.Filter.Eq((fun doc -> doc.user.email), request.user.email)
+    let updateUser = Builders.Update.Set((fun doc -> doc.user.bio), request.user.bio)
+                                    .Set((fun doc -> doc.user.image), request.user.image)
+                                    .Set((fun doc -> doc.user.username), request.user.username)
+        
     Some (collection.UpdateOne(requestedUser, updateUser))
-
+    
   let getUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection "Users"
     let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)
