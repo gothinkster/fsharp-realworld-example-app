@@ -15,9 +15,6 @@ module Actions =
   let jsonToString (json: 'a) = 
     Newtonsoft.Json.JsonConvert.SerializeObject(json)
 
-  let fakeReply email = 
-    {user = { email = email; token = ""; username=""; bio=""; image=""; passwordhash=""; favorites=[||] }; Id=ObjectId.GenerateNewId().ToString()  }
-
   let extractStringQueryVal (queryParameters : HttpRequest) name =
     match queryParameters.queryParam name with
     | Choice1Of2 queryVal -> queryVal
@@ -90,8 +87,7 @@ module Actions =
     let succesful = insertNewArticle articleToAdd dbCLient
     articleToAdd 
 
-  let getArticlesBy slug dbClient =
-    (* TODO: Add suave testing for this. *)
+  let getArticlesBy slug dbClient =    
     getArticleBySlug dbClient slug
     |> RealWorld.Convert.extractArticleList
     |> jsonToString
@@ -160,3 +156,21 @@ module Actions =
   let removeFavoriteCurrentUser slug dbClient = 
     // TODO: Do the same thing as above except remove them from the favorite list
     Successful.OK ""
+
+  let getFollowedProfile dbClient username httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try        
+        let profile = followUser dbClient token.UserName username |> Convert.userToProfile
+
+        return! Successful.OK (profile |> jsonToString) httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
+
+  let removeFollowedProfile dbClient username httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try  
+        return! Successful.OK "" httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })

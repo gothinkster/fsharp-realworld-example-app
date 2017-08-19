@@ -37,6 +37,7 @@ namespace RealWorld
       image : string;
       passwordhash : string;
       favorites : string array;
+      following : string array;
     }
 
     type User = {

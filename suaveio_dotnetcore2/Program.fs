@@ -18,14 +18,15 @@ let serverConfig =
   let randomPort = Random().Next(7000, 7999)
   { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" randomPort] }
 
-let validateCredentials dbClient = RealWorld.Auth.loginWithCredentials dbClient
-let updateCurrentUser dbClient = updateUser dbClient
-let userProfile dbClient username = getUserProfile dbClient username
+let validateCredentials dbClient   = RealWorld.Auth.loginWithCredentials dbClient
+let updateCurrentUser dbClient     = updateUser dbClient
+let userProfile dbClient username  = getUserProfile dbClient username
+let followUser dbClient username   = getFollowedProfile dbClient username
+let unfollowUser dbClient username = removeFollowedProfile dbClient username
 
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient
 
-//TODO: Replace each return comments with function to carry out the action.
 let app (dbClient: IMongoDatabase) = 
   choose [
     POST >=> path "/users/login" >=> validateCredentials dbClient
@@ -33,8 +34,8 @@ let app (dbClient: IMongoDatabase) =
     GET  >=> path "/user" >=> getCurrentUser dbClient
     PUT  >=> path "/user" >=> updateCurrentUser dbClient
     GET  >=> pathScan "/profile/%s" (fun username -> userProfile dbClient username)
-    POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
-    DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
+    POST >=> pathScan "/profiles/%s/follow" (fun username -> followUser dbClient username)
+    DELETE >=> pathScan "/profiles/%s/follow" (fun username -> unfollowUser dbClient username)
     GET  >=> path "/articles" >=> getArticles dbClient
     GET  >=> path "/articles/feed" >=> getArticlesForFeed dbClient
     GET  >=> pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)

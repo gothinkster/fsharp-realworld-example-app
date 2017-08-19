@@ -101,6 +101,18 @@ module DB =
         
     Some (collection.UpdateOne(requestedUser, updateUser))
     
+  let followUser (dbClient: IMongoDatabase) (userName: string) (followedUserName: string) =
+    let collection = dbClient.GetCollection<User> "Users"
+    let requestedUser = collection.AsQueryable().Where(fun user -> user.user.email = userName).ToList()
+    let requestedId = (requestedUser |> Seq.first).Value.Id
+
+    let currentFollowers: User = (collection.AsQueryable().Where(fun user -> user.user.email = userName).ToList() |> Seq.first).Value
+    let requestedFilter = Builders.Filter.Eq((fun (doc: User) -> doc.user.email), followedUserName)
+    let updateUser = Builders.Update.Set((fun doc -> doc.user.following), Array.append currentFollowers.user.following [|requestedId|] )
+    collection.UpdateOne(requestedFilter, updateUser) |> ignore
+
+    currentFollowers
+   
   let getUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection "Users"
     let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)
@@ -126,8 +138,7 @@ module DB =
     | _ -> None
 
   let saveNewComment (comment: Comment) articleId (dbClient: IMongoDatabase) =
-    let collection = dbClient.GetCollection<BsonDocument> "Comment"
-    (* TODO: Add user to the saved comment *)
+    let collection = dbClient.GetCollection<BsonDocument> "Comment"    
     let commentDetails = BsonDocument([
                                         BsonElement("id",BsonValue.Create articleId);
                                         BsonElement("createdAt",BsonDateTime.Create DateTime.Now);

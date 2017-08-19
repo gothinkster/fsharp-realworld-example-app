@@ -32,3 +32,7 @@ module BsonDocConverter =
   let extractPasswordHash dboc = 
     let userToLogin = Seq.find (fun (user:BsonElement) -> user.Name = "user") dboc
     userToLogin.Value.AsBsonDocument.GetElement("passwordhash").Value.ToString()
+
+  let toUserId (bdocUser: BsonDocument) =
+    bdocUser.GetElement("_id").Value.ToString()
+    

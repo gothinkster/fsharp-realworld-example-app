@@ -6,6 +6,8 @@ open RealWorld.Models
 open MongoDB.Bson
 open Newtonsoft.Json
 
+let generatedUserId = BsonObjectId(ObjectId.GenerateNewId())
+
 let samepleBdoc () = 
   let author = BsonDocument([
                               BsonElement("username", BsonValue.Create "");
@@ -27,7 +29,7 @@ let samepleBdoc () =
                                     ])
   BsonDocument([ 
                 BsonElement("article", BsonValue.Create articleDetails) 
-                BsonElement("_id", BsonValue.Create (BsonObjectId(ObjectId.GenerateNewId()))) 
+                BsonElement("_id", BsonValue.Create (generatedUserId)) 
                ])
 
 [<Tests>]
@@ -47,8 +49,8 @@ let tests =
       let article = convertedBdoc |> Array.head 
       Expect.equal article.article.slug "inception-movie" "Did not transform bson doc correctly"
 
-    testCase "serialize bdoc" <| fun _ -> 
-      //MongoDB.Bson.Serialization.BsonSerializer.Deserialize<Article>(samepleBdoc ()) |> printfn "doc: %A"
-      Expect.equal true true ""
+    testCase "Should extract the document id from the user" <| fun _ -> 
+      let userId = RealWorld.BsonDocConverter.toUserId (samepleBdoc ())
+      Expect.equal userId (generatedUserId.ToString()) "Didn't extract the id of the document"
   ]
 

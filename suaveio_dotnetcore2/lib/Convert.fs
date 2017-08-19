@@ -14,8 +14,19 @@ module Convert =
                 bio = "";
                 image = "";
                 favorites=[||];
+                following=[||];
             };
       Id = "";
+    }
+
+  let userToProfile (user: User) = 
+    {
+      profile = {
+                  username = user.user.username;
+                  bio = user.user.bio;
+                  image = user.user.image;
+                  following = true;
+      }
     }
   
   let updateUser (user:UserDetails) (result : UpdateResult option) : string  =

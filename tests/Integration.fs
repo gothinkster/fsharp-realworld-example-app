@@ -15,6 +15,10 @@ open RealWorld.Models
 open RealWorld.Convert
 open Newtonsoft.Json
 
+let dbClient = 
+  let client = MongoClient("mongodb://localhost:27017")
+  client.GetDatabase("realworld")
+
 [<Tests>]
 let tests = 
   testList "Integration" [
