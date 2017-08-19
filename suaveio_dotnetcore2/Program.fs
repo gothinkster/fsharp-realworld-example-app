@@ -46,7 +46,7 @@ let app (dbClient: IMongoDatabase) =
     DELETE >=> pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)
     POST >=> pathScan "/articles/%s/favorite" (fun slug -> favoriteArticle slug dbClient) 
     DELETE >=> pathScan "/articles/%s/favorite" (fun slug -> removeFavoriteCurrentUser slug dbClient) 
-    POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle dbClient)) // Creates a new article
+    POST >=> path "/articles" >=> (mapJson (fun (newArticle : Article) -> mapJsonToArticle newArticle dbClient)) 
     GET >=> path "/tags" >=> getTagList dbClient
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
