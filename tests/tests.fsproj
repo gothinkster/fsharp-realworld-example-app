@@ -6,8 +6,7 @@
   <ItemGroup>
     <Compile Include="Utils.fs" />
     <Compile Include="Integration.fs" />
-    <Compile Include="Articles.fs" />
-    <Compile Include="Sample.fs" />
+    <Compile Include="Articles.fs" />    
     <Compile Include="Main.fs" />
     <PackageReference Include="Expecto" Version="5.0.0-*" />
     <PackageReference Include="Suave" Version="2.1.0" />

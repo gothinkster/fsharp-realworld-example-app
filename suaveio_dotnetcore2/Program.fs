@@ -20,6 +20,7 @@ let serverConfig =
 
 let validateCredentials dbClient = RealWorld.Auth.loginWithCredentials dbClient
 let updateCurrentUser dbClient = updateUser dbClient
+let userProfile dbClient username = getUserProfile dbClient username
 
 let mapJsonToArticle (article : Article) dbClient = 
   createNewArticle article dbClient
@@ -31,7 +32,7 @@ let app (dbClient: IMongoDatabase) =
     POST >=> path "/users" >=> registerNewUser dbClient
     GET  >=> path "/user" >=> getCurrentUser dbClient
     PUT  >=> path "/user" >=> updateCurrentUser dbClient
-    GET  >=> pathScan "/profile/%s" (fun username -> getUserProfile dbClient username)
+    GET  >=> pathScan "/profile/%s" (fun username -> userProfile dbClient username)
     POST >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     DELETE >=> path "/profiles/:username/follow" >=> (Successful.OK Responses.singleProfile)
     GET  >=> path "/articles" >=> getArticles dbClient

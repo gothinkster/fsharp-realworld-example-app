@@ -78,7 +78,12 @@ module Actions =
 
   open RealWorld.Stubs
   let getUserProfile dbClient username httpContext = 
-    (Successful.OK Responses.singleProfile)
+    Auth.useToken httpContext (fun token -> async {
+      try 
+        return! Successful.OK (currentUserByEmail dbClient username) httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
 
   let createNewArticle (articleToAdd : Article) dbCLient = 
     // TODO: add success response
