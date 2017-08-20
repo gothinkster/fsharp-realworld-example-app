@@ -169,8 +169,9 @@ module Actions =
 
   let removeFollowedProfile dbClient username httpContext = 
     Auth.useToken httpContext (fun token -> async {
-      try  
-        return! Successful.OK "" httpContext
+      try 
+        let profile = unfollowUser dbClient token.UserName username |> Convert.userToProfile 
+        return! Successful.OK (profile |> jsonToString) httpContext
       with ex ->
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })

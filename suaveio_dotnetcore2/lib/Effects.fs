@@ -112,6 +112,18 @@ module DB =
     collection.UpdateOne(requestedFilter, updateUser) |> ignore
 
     currentFollowers
+
+  let unfollowUser (dbClient: IMongoDatabase) (userName: string) (followedUserName: string) = 
+    let collection = dbClient.GetCollection<User> "Users"
+    let requestedUser = collection.AsQueryable().Where(fun user -> user.user.email = userName).ToList()
+    let requestedId = (requestedUser |> Seq.first).Value.Id
+
+    let currentFollowers: User = (collection.AsQueryable().Where(fun user -> user.user.email = userName).ToList() |> Seq.first).Value
+    let requestedFilter = Builders.Filter.Eq((fun (doc: User) -> doc.user.email), followedUserName)    
+    let updateUser = Builders.Update.Set((fun doc -> doc.user.following), Array.filter ((<>) requestedId) currentFollowers.user.following )
+    collection.UpdateOne(requestedFilter, updateUser) |> ignore
+
+    currentFollowers
    
   let getUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection "Users"
