@@ -81,10 +81,24 @@ module Actions =
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
 
-  let createNewArticle (articleToAdd : Article) dbCLient = 
-    // TODO: add success response
-    let succesful = insertNewArticle articleToAdd dbCLient
-    articleToAdd 
+  let createNewArticle dbCLient httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try 
+        let newArticle = (JsonConvert.DeserializeObject<Article>(httpContext.request.rawForm |> System.Text.Encoding.UTF8.GetString))  
+    
+        let checkedArticle = 
+          newArticle 
+          |> RealWorld.Convert.checkNullAuthor 
+          |> RealWorld.Convert.checkNullSlug
+          |> RealWorld.Convert.checkFavoriteIds
+        
+        insertNewArticle checkedArticle dbCLient |> ignore
+    
+        return! Successful.OK (checkedArticle |> jsonToString) httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
+
 
   let getArticlesBy slug dbClient =    
     getArticleBySlug dbClient slug

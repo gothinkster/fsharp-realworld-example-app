@@ -27,14 +27,7 @@ let articles dbClient              = getArticles dbClient
 let articlesForFeed dbClient       = getArticlesForFeed dbClient
 let favArticle slug dbClient       = favoriteArticle slug dbClient
 let removeFavArticle slug dbClient = removeFavoriteCurrentUser slug dbClient
-
-let mapJsonToArticle dbClient (ctx: HttpContext)= async {
-  let newArticle = (JsonConvert.DeserializeObject<Article>(ctx.request.rawForm |> System.Text.Encoding.UTF8.GetString))  
-  // TODO: Create defaults for possible nulls before saving.
-  printfn "Article: %A" (obj.ReferenceEquals(newArticle.article.author, null))
-  //createNewArticle article dbClient
-  return! Successful.OK "passed" ctx 
-}
+let mapJsonToArticle dbClient      = createNewArticle dbClient 
   
 let app (dbClient: IMongoDatabase) = 
   choose [

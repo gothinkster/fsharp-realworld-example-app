@@ -58,4 +58,37 @@ module Convert =
     match result with
     | Some article -> article
     | None -> defaultArticle
-    
+
+  let defaultAuthor = { 
+    username = "";
+    bio = "";
+    image = "";
+    following = false;
+  }
+
+  let checkNullAuthor (art: Article) = 
+    if obj.ReferenceEquals(art.article.author, null) then 
+      { art with article = {
+                              art.article with author = defaultAuthor 
+                           }
+      }
+    else
+      art
+
+  let checkNullSlug (art: Article) = 
+    if obj.ReferenceEquals(art.article.slug, null) then 
+      { art with article = {
+                              art.article with slug = ""
+                           }
+      }
+    else
+      art
+
+  let checkFavoriteIds (art: Article) = 
+    if obj.ReferenceEquals(art.article.favoriteIds, null) then 
+      { art with article = {
+                              art.article with favoriteIds = [||]
+                           }
+      }
+    else
+      art

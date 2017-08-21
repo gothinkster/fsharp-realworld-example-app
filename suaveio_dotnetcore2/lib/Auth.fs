@@ -56,8 +56,8 @@ let loginWithCredentials dbClient (ctx: HttpContext) = async {
 /// code (e.g. WishList.getWishList).
 let useToken ctx f = async {
     match ctx.request.header "Authorization" with
-    | Choice1Of2 accesstoken when accesstoken.StartsWith "Bearer " -> 
-        let jwt = accesstoken.Replace("Bearer ","")
+    | Choice1Of2 accesstoken when accesstoken.StartsWith "Token " -> 
+        let jwt = accesstoken.Replace("Token ","")
         match JsonWebToken.isValid jwt with
         | None -> return! FORBIDDEN "Accessing this API is not allowed" ctx
         | Some token -> return! f token
