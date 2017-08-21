@@ -12,7 +12,7 @@ module Convert =
                 passwordhash = "";
                 token = "";
                 bio = "";
-                image = "";
+                image = "";                
                 favorites=[||];
                 following=[||];
             };
@@ -47,6 +47,7 @@ module Convert =
         body = ""; 
         createdAt = System.DateTime.Now; 
         updatedAt = System.DateTime.Now; 
+        favoriteIds = [||];
         favorited = false; 
         favoritesCount = 0u; 
         author = defaultProfile; 

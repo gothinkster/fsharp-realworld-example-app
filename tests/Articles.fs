@@ -23,6 +23,7 @@ let samepleBdoc () =
                                       BsonElement("createdAt", BsonValue.Create (System.DateTime.Now));
                                       BsonElement("updatedAt", BsonValue.Create (System.DateTime.Now));
                                       BsonElement("favorited", BsonValue.Create true);
+                                      BsonElement("favoriteIds", BsonValue.Create []);
                                       BsonElement("favoritesCount", BsonValue.Create 0);
                                       BsonElement("author", BsonValue.Create author);
                                       BsonElement("tagList", BsonValue.Create []);

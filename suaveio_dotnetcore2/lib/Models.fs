@@ -67,10 +67,11 @@ namespace RealWorld
       body           : string;
       createdAt      : System.DateTime;
       updatedAt      : System.DateTime;
+      favoriteIds    : string array;      
       favorited      : bool;
       favoritesCount : uint32;
       author         : ProfileDetails;
-      tagList        : string array
+      tagList        : string array;
     }
 
     type Article = {

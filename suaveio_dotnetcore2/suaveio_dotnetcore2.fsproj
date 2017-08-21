@@ -11,8 +11,7 @@
     <Compile Include="lib/Effects.fs" />
     <Compile Include="lib/JsonWebToken.fs" />
     <Compile Include="lib/Hash.fs" />
-    <Compile Include="lib/Auth.fs" />
-    <Compile Include="lib/Stubs.fs" />
+    <Compile Include="lib/Auth.fs" />    
     <Compile Include="lib/Actions.fs" />
     <Compile Include="Program.fs" />
     <PackageReference Include="Fable.JsonConverter" Version="1.0.1" />

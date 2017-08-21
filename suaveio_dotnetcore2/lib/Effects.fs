@@ -64,7 +64,7 @@ module DB =
                                       BsonElement("article", BsonValue.Create articleDetails)
                                   ])
 
-    let collection = dbClient.GetCollection<BsonDocument> "Article"
+    let collection = dbClient.GetCollection<BsonDocument> "Article"    
     collection.InsertOne(bsonArticle)    
     article
 
@@ -124,7 +124,15 @@ module DB =
     collection.UpdateOne(requestedFilter, updateUser) |> ignore
 
     currentFollowers
-   
+  
+  let favoriteArticleForUser (dbClient: IMongoDatabase) (username: string) (slug: string) = 
+    let collection = dbClient.GetCollection<Article> "Article"
+    let requestedArticle = collection.AsQueryable().Where(fun art -> art.article.slug = slug).ToList() |> List.ofSeq |> List.first
+    requestedArticle    
+  
+  let removeFavoriteArticleFromUser (dbClient: IMongoDatabase) (username: string) (slug: string) = 
+    ()
+
   let getUser (dbClient: IMongoDatabase) (userName: string)  = 
     let collection = dbClient.GetCollection "Users"
     let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)

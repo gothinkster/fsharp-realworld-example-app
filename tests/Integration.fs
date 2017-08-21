@@ -23,6 +23,7 @@ let dbClient =
 let tests = 
   testList "Integration" [
     testCase "Current working test for trying out impure functions" <| fun _ ->
+      //favoriteArticleForUser dbClient "lee.bryant@gmail.com" "inserted-data" |> printfn "Article: %A"
       Expect.equal true true String.Empty
 
     testCase "Getting articles" <| fun _ -> 

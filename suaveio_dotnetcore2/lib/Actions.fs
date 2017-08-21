@@ -72,8 +72,7 @@ module Actions =
       with ex ->
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
-
-  open RealWorld.Stubs
+  
   let getUserProfile dbClient username httpContext = 
     Auth.useToken httpContext (fun token -> async {
       try 
@@ -107,18 +106,32 @@ module Actions =
     |> jsonToString
     |> Successful.OK 
 
-  (* TODO: Look into consolidating these functions since they are close in functionality *)
-  let getArticles dbClient = 
-    getSavedArticles dbClient
-    |> RealWorld.BsonDocConverter.toArticleList
-    |> jsonToString
-    |> Successful.OK
+  let getArticles dbClient httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try 
+        let articles = 
+          getSavedArticles dbClient
+          |> RealWorld.BsonDocConverter.toArticleList
+          |> jsonToString         
 
-  let getArticlesForFeed dbClient = 
-    getSavedFollowedArticles dbClient
-    |> defaultArticleIfEmpty
-    |> jsonToString
-    |> Successful.OK
+        return! Successful.OK articles httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
+
+  let getArticlesForFeed dbClient httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try 
+        let articles = 
+          getSavedFollowedArticles dbClient
+          |> defaultArticleIfEmpty
+          |> jsonToString           
+
+        return! Successful.OK articles httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
+    
 
   let addArticleWithSlug json (slug: string) (dbClient: MongoDB.Driver.IMongoDatabase) = 
     let currentArticle = json |> Suave.Json.fromJson<Article> 
@@ -149,13 +162,24 @@ module Actions =
     |> jsonToString
     |> Successful.OK
 
-  let favoriteArticle slug dbClient = 
+  let favoriteArticle slug dbClient httpContext = 
     // TODO: Get the current user, then get the article by the slug and add the object id to the users favorite list
-    Successful.OK ""
+     Auth.useToken httpContext (fun token -> async {
+      try  
+        let article = favoriteArticleForUser dbClient token.UserName slug
+        return! Successful.OK ("") httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
 
-  let removeFavoriteCurrentUser slug dbClient = 
+  let removeFavoriteCurrentUser slug dbClient httpContext = 
     // TODO: Do the same thing as above except remove them from the favorite list
-    Successful.OK ""
+     Auth.useToken httpContext (fun token -> async {
+      try        
+        return! Successful.OK ("") httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
 
   let getFollowedProfile dbClient username httpContext = 
     Auth.useToken httpContext (fun token -> async {
