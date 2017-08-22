@@ -58,9 +58,11 @@ let app (dbClient: IMongoDatabase) =
 
     DELETE >=> choose [
       pathScan "/profiles/%s/follow" (fun username -> unfollowUser dbClient username)
-      pathScan "/articles/%s" (fun slug -> deleteArticle dbClient slug)
+      pathScan "/articles/%s/favorite" (fun slug -> removeFavArticle slug dbClient)  
       pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)
-      pathScan "/articles/%s/favorite" (fun slug -> printfn"Getting called here";removeFavArticle slug dbClient)     
+      pathScan "/articles/%s" (fun slug -> deleteArticle dbClient slug)
+      
+      RequestErrors.NOT_FOUND "Route not found"  
     ]
        
     path "/" >=> (Successful.OK "This will return the base page.")
