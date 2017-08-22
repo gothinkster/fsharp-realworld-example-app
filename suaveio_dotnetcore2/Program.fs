@@ -32,25 +32,37 @@ let deleteArticle dbClient slug    = deleteArticleBy slug dbClient
   
 let app (dbClient: IMongoDatabase) = 
   choose [
-    POST >=> path "/users/login" >=> validateCredentials dbClient
-    POST >=> path "/users" >=> registerNewUser dbClient
-    GET  >=> path "/user" >=> getCurrentUser dbClient
-    PUT  >=> path "/user" >=> updateCurrentUser dbClient
-    GET  >=> pathScan "/profile/%s" (fun username -> userProfile dbClient username)
-    POST >=> pathScan "/profiles/%s/follow" (fun username -> followUser dbClient username)
-    DELETE >=> pathScan "/profiles/%s/follow" (fun username -> unfollowUser dbClient username)
-    GET  >=> path "/articles" >=> articles dbClient
-    GET  >=> path "/articles/feed" >=> articlesForFeed dbClient
-    GET  >=> pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
-    PUT  >=> pathScan "/articles/%s" (fun slug -> request(fun req -> addArticleWithSlug req.rawForm slug dbClient))
-    DELETE >=> pathScan "/articles/%s" (fun slug -> deleteArticle dbClient slug)
-    POST >=> pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))  
-    GET  >=> pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
-    DELETE >=> pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)
-    POST >=> pathScan "/articles/%s/favorite" (fun slug -> favArticle slug dbClient) 
-    DELETE >=> pathScan "/articles/%s/favorite" (fun slug -> removeFavArticle slug dbClient)     
-    POST >=> path "/articles" >=> mapJsonToArticle dbClient 
-    GET >=> path "/tags" >=> getTagList dbClient
+    GET >=> choose [
+      path "/user" >=> getCurrentUser dbClient
+      pathScan "/profile/%s" (fun username -> userProfile dbClient username)
+      path "/articles" >=> articles dbClient
+      path "/articles/feed" >=> articlesForFeed dbClient
+      pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
+      pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
+      path "/tags" >=> getTagList dbClient
+    ]
+
+    POST >=> choose [
+      pathScan "/articles/%s/favorite" (fun slug -> favArticle slug dbClient)     
+      path "/users/login" >=> validateCredentials dbClient
+      path "/users" >=> registerNewUser dbClient
+      pathScan "/profiles/%s/follow" (fun username -> followUser dbClient username)
+      pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))        
+      path "/articles" >=> mapJsonToArticle dbClient 
+    ]
+
+    PUT >=> choose [
+      path "/user" >=> updateCurrentUser dbClient
+      pathScan "/articles/%s" (fun slug -> request(fun req -> addArticleWithSlug req.rawForm slug dbClient))
+    ]
+
+    DELETE >=> choose [
+      pathScan "/profiles/%s/follow" (fun username -> unfollowUser dbClient username)
+      pathScan "/articles/%s" (fun slug -> deleteArticle dbClient slug)
+      pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)
+      pathScan "/articles/%s/favorite" (fun slug -> printfn"Getting called here";removeFavArticle slug dbClient)     
+    ]
+       
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
 

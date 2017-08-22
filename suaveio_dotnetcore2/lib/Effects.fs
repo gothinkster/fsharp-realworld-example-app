@@ -149,7 +149,18 @@ module DB =
     | None -> None   
   
   let removeFavoriteArticleFromUser (dbClient: IMongoDatabase) (username: string) (slug: string) = 
-    ()
+    let collection = dbClient.GetCollection<Article> "Article"
+    let requestedArticle = collection.AsQueryable().Where(fun art -> art.article.slug = slug).ToList() |> List.ofSeq |> List.first
+    match requestedArticle with
+    | Some art -> 
+      let currentUser = (getUser dbClient username).Value |> RealWorld.BsonDocConverter.toUserId
+      // TODO: Only updated if they haven't updated before
+      printfn "Current ids: %A" art.article.favoriteIds
+      let updatedFavoriteArticle = Builders.Update.Set((fun doc -> doc.article.favoriteIds), Array.filter ((<>)currentUser) art.article.favoriteIds)    
+      collection.UpdateOne((fun art -> art.article.slug = slug), updatedFavoriteArticle) |> ignore    
+      
+      requestedArticle
+    | None -> None  
 
   let articleFilter slug = Builders.Filter.Eq((fun article -> article.article.slug), slug)
 

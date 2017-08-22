@@ -186,18 +186,20 @@ module Actions =
   let favoriteArticle slug dbClient httpContext = 
     // TODO: Get the current user, then get the article by the slug and add the object id to the users favorite list
      Auth.useToken httpContext (fun token -> async {
-      // try  
-        let article = favoriteArticleForUser dbClient token.UserName slug
+      try  
+        favoriteArticleForUser dbClient token.UserName slug |> ignore
         return! Successful.OK ("") httpContext
-      // with ex ->
-      //   return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
 
-  let removeFavoriteCurrentUser slug dbClient httpContext = 
-    // TODO: Do the same thing as above except remove them from the favorite list
-     Auth.useToken httpContext (fun token -> async {
-      try        
-        return! Successful.OK ("") httpContext
+  let removeFavoriteCurrentUser slug dbClient httpContext =     
+    printfn "before calling remove"
+    Auth.useToken httpContext (fun token -> async {
+      try 
+        
+        removeFavoriteArticleFromUser dbClient token.UserName slug |> ignore
+        return! Successful.OK ("") httpContext  
       with ex ->
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
