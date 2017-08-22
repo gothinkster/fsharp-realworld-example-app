@@ -155,7 +155,6 @@ module DB =
     | Some art -> 
       let currentUser = (getUser dbClient username).Value |> RealWorld.BsonDocConverter.toUserId
       // TODO: Only updated if they haven't updated before
-      printfn "Current ids: %A" art.article.favoriteIds
       let updatedFavoriteArticle = Builders.Update.Set((fun doc -> doc.article.favoriteIds), Array.filter ((<>)currentUser) art.article.favoriteIds)    
       collection.UpdateOne((fun art -> art.article.slug = slug), updatedFavoriteArticle) |> ignore    
       

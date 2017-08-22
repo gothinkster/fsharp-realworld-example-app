@@ -194,7 +194,6 @@ module Actions =
     })
 
   let removeFavoriteCurrentUser slug dbClient httpContext =     
-    printfn "before calling remove"
     Auth.useToken httpContext (fun token -> async {
       try 
         
