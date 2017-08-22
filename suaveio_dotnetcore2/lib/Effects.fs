@@ -55,6 +55,7 @@ module DB =
                                         BsonElement("body", BsonValue.Create article.article.body);
                                         BsonElement("createdAt", BsonValue.Create article.article.createdAt);
                                         BsonElement("updatedAt", BsonValue.Create article.article.updatedAt);
+                                        BsonElement("favoriteIds", BsonValue.Create article.article.favoriteIds);
                                         BsonElement("favorited", BsonValue.Create article.article.favorited);
                                         BsonElement("favoritesCount", BsonValue.Create article.article.favoritesCount);
                                         BsonElement("author", BsonValue.Create profileDetails);
@@ -113,6 +114,15 @@ module DB =
 
     currentFollowers
 
+  
+  let getUser (dbClient: IMongoDatabase) (userName: string)  = 
+    let collection = dbClient.GetCollection "Users"
+    let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)
+    let results = collection.Find(filter).ToListAsync()
+                  |> Async.AwaitTask
+                  |> Async.RunSynchronously
+    if Seq.isEmpty results then None else (results |> Seq.first)
+
   let unfollowUser (dbClient: IMongoDatabase) (userName: string) (followedUserName: string) = 
     let collection = dbClient.GetCollection<User> "Users"
     let requestedUser = collection.AsQueryable().Where(fun user -> user.user.email = userName).ToList()
@@ -128,18 +138,18 @@ module DB =
   let favoriteArticleForUser (dbClient: IMongoDatabase) (username: string) (slug: string) = 
     let collection = dbClient.GetCollection<Article> "Article"
     let requestedArticle = collection.AsQueryable().Where(fun art -> art.article.slug = slug).ToList() |> List.ofSeq |> List.first
-    requestedArticle    
+    match requestedArticle with
+    | Some art -> 
+      let currentUser = (getUser dbClient username).Value |> RealWorld.BsonDocConverter.toUserId
+      // TODO: Only updated if they haven't updated before
+      let updatedFavoriteArticle = Builders.Update.Set((fun doc -> doc.article.favoriteIds), Array.append requestedArticle.Value.article.favoriteIds [|currentUser|])    
+      collection.UpdateOne((fun art -> art.article.slug = slug), updatedFavoriteArticle) |> ignore    
+      
+      requestedArticle
+    | None -> None   
   
   let removeFavoriteArticleFromUser (dbClient: IMongoDatabase) (username: string) (slug: string) = 
     ()
-
-  let getUser (dbClient: IMongoDatabase) (userName: string)  = 
-    let collection = dbClient.GetCollection "Users"
-    let filter = FilterDefinition<BsonDocument>.op_Implicit(sprintf """{"user.email": "%s"}""" userName)
-    let results = collection.Find(filter).ToListAsync()
-                  |> Async.AwaitTask
-                  |> Async.RunSynchronously
-    if Seq.isEmpty results then None else (results |> Seq.first)
 
   let articleFilter slug = Builders.Filter.Eq((fun article -> article.article.slug), slug)
 
