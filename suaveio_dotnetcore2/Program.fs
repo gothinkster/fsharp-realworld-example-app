@@ -28,6 +28,7 @@ let articlesForFeed dbClient       = getArticlesForFeed dbClient
 let favArticle slug dbClient       = favoriteArticle slug dbClient
 let removeFavArticle slug dbClient = removeFavoriteCurrentUser slug dbClient
 let mapJsonToArticle dbClient      = createNewArticle dbClient 
+let deleteArticle dbClient slug    = deleteArticleBy slug dbClient
   
 let app (dbClient: IMongoDatabase) = 
   choose [
@@ -42,7 +43,7 @@ let app (dbClient: IMongoDatabase) =
     GET  >=> path "/articles/feed" >=> articlesForFeed dbClient
     GET  >=> pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
     PUT  >=> pathScan "/articles/%s" (fun slug -> request(fun req -> addArticleWithSlug req.rawForm slug dbClient))
-    DELETE >=> pathScan "/articles/%s" (fun slug -> deleteArticleBy slug dbClient)
+    DELETE >=> pathScan "/articles/%s" (fun slug -> deleteArticle dbClient slug)
     POST >=> pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))  
     GET  >=> pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
     DELETE >=> pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)

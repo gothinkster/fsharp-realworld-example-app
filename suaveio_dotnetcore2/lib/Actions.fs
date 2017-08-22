@@ -155,7 +155,14 @@ module Actions =
     |> jsonToString
     |> Successful.OK
 
-  let deleteArticleBy slug dbClient = Successful.OK ((deleteArticleBySlug slug dbClient).ToString())
+  let deleteArticleBy slug dbClient httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try  
+        deleteArticleBySlug slug dbClient |> ignore
+        return! Successful.OK ("") httpContext
+      with ex ->
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })    
 
   let addCommentBy json slug dbClient = 
     let possibleArticleId = getArticleBySlug dbClient slug

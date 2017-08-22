@@ -6,6 +6,7 @@
   <ItemGroup>
     <Compile Include="Utils.fs" />
     <Compile Include="Integration.fs" />
+    <Compile Include="Converter.fs" />
     <Compile Include="Articles.fs" />    
     <Compile Include="Main.fs" />
     <PackageReference Include="Expecto" Version="5.0.0-*" />
