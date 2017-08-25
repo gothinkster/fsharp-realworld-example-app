@@ -193,7 +193,7 @@ module Actions =
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
 
-  let removeFavoriteCurrentUser slug dbClient httpContext =         
+  let removeFavoriteCurrentUser slug dbClient httpContext =     
     Auth.useToken httpContext (fun token -> async {
       try         
         removeFavoriteArticleFromUser dbClient token.UserName slug |> ignore

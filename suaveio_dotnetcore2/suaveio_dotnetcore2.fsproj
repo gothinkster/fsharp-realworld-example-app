@@ -11,15 +11,16 @@
     <Compile Include="lib/Effects.fs" />
     <Compile Include="lib/JsonWebToken.fs" />
     <Compile Include="lib/Hash.fs" />
-    <Compile Include="lib/Auth.fs" />    
+    <Compile Include="lib/Auth.fs" />
     <Compile Include="lib/Actions.fs" />
     <Compile Include="Program.fs" />
     <PackageReference Include="Fable.JsonConverter" Version="1.0.1" />
     <PackageReference Include="jose-jwt" Version="2.4.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
+    <PackageReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.3" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="Suave" Version="2.1.0" />
-    <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.0-preview2-final" />
+    <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.0" />
   </ItemGroup>
 </Project>
