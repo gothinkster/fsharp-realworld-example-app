@@ -4,7 +4,7 @@
 
 # Installation
 
-* Install .NET Core Framework from here [.NET Core](https://www.microsoft.com/net/core)
+* Install .NET Core 2.0 Framework from here [.NET Core](https://www.microsoft.com/net/core)
 * Download MongoDB from here [MongoDB](https://www.mongodb.com/download-center#community)
 * Clone this repo
 * Execute the following command on the command line in the directory that has the web framework that you would like to try: dotnet restore

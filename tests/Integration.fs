@@ -23,9 +23,7 @@ let dbClient =
 let tests = 
   testList "Integration" [
     testCase "Current working test for trying out impure functions" <| fun _ ->
-            
-      Expect.equal true true String.Empty
-
-    testCase "Getting articles" <| fun _ -> 
-      Expect.equal true true String.Empty
+      // This test can be used to testing individual functions if you don't want to use 
+      // F# interactive
+      Expect.equal true true String.Empty   
   ]

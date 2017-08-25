@@ -92,3 +92,6 @@ module Convert =
       }
     else
       art
+
+  let addDefaultSlug (art: Article) = 
+    art
