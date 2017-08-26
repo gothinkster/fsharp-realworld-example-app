@@ -91,6 +91,7 @@ module Actions =
           |> RealWorld.Convert.checkNullAuthor 
           |> RealWorld.Convert.checkNullSlug
           |> RealWorld.Convert.checkFavoriteIds
+          |> RealWorld.Convert.addDefaultSlug
         
         insertNewArticle checkedArticle dbCLient |> ignore
     

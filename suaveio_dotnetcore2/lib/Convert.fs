@@ -94,4 +94,11 @@ module Convert =
       art
 
   let addDefaultSlug (art: Article) = 
-    art
+    if String.isEmpty art.article.slug then
+      let wordSections = art.article.title.Split() 
+                         |> Array.map (fun eachWord -> eachWord.ToLower().Trim())
+                         |> String.concat "-"
+      
+      {art with article = { art.article with slug = wordSections}}
+    else
+      art

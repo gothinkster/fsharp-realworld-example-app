@@ -36,7 +36,14 @@ let samepleBdoc () =
 [<Tests>]
 let tests = 
   testList "Bson Conversion functions" [
-    testCase "" <| fun _ ->
+    testCase "Should extract the document id" <| fun _ ->
       let extractedId = RealWorld.BsonDocConverter.toUserId (samepleBdoc())      
       Expect.equal (generatedUserId.ToString()) extractedId "Failed to extract the document id"
+
+    testCase "" <| fun _ -> 
+      let bdoc = RealWorld.Convert.defaultArticle
+      let docWithoutSlug = { bdoc with article = {bdoc.article with title = "The Last Dragon"} }
+
+      let result = RealWorld.Convert.addDefaultSlug docWithoutSlug
+      Expect.equal "the-last-dragon" result.article.slug "Did not properly convert the slug from title"
   ]               
