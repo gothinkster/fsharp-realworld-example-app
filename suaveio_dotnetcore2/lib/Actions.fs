@@ -165,11 +165,12 @@ module Actions =
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })    
 
-  let addCommentBy json slug dbClient = 
+  let addCommentBy rawJson slug dbClient  =   
+    let json = rawJson |> System.Text.Encoding.UTF8.GetString
     let possibleArticleId = getArticleBySlug dbClient slug
     match possibleArticleId with
     | Some articleId -> 
-      saveNewComment (Suave.Json.fromJson<Comment> json) (articleId.Id.ToString()) dbClient |> ignore
+      saveNewComment (JsonConvert.DeserializeObject<RequestComment> json ) (articleId.Id.ToString()) dbClient |> ignore
       Successful.OK (json |> jsonToString)
     | None -> 
       Successful.OK ({errors = {body = [|"Could not find article by slug"|]}} |> jsonToString) 

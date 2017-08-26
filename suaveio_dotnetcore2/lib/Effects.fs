@@ -179,7 +179,7 @@ module DB =
     | Some article -> Some article.Id
     | _ -> None
 
-  let saveNewComment (comment: Comment) articleId (dbClient: IMongoDatabase) =
+  let saveNewComment (comment: RequestComment) articleId (dbClient: IMongoDatabase) =
     let collection = dbClient.GetCollection<BsonDocument> "Comment"    
     let commentDetails = BsonDocument([
                                         BsonElement("id",BsonValue.Create articleId);

@@ -29,6 +29,7 @@ let favArticle slug dbClient       = favoriteArticle slug dbClient
 let removeFavArticle slug dbClient = removeFavoriteCurrentUser slug dbClient
 let mapJsonToArticle dbClient      = createNewArticle dbClient 
 let deleteArticle dbClient slug    = deleteArticleBy slug dbClient
+let addComment dbClient slug       = addCommentBy slug dbClient
   
 let app (dbClient: IMongoDatabase) = 
   choose [

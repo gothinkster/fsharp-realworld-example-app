@@ -102,6 +102,14 @@ namespace RealWorld
       comment : CommentBody;
     }
 
+    type RequestCommentDetails = {      
+      body : string;      
+    }
+
+    type RequestComment = {
+      comment : RequestCommentDetails;
+    }
+
     type Comment = {
       comment : CommentDetails;
     }
