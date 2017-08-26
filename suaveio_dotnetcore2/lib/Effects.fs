@@ -8,9 +8,12 @@ module DB =
   open MongoDB.Bson
   open MongoDB.Driver.Linq
   open System
+  open RealWorld.Convert
 
   // TODO: Convert side effects to return option types
   let currentDir = Directory.GetCurrentDirectory()
+
+
 
   let getConfigDbConnection currentDir = 
     let builder = ConfigurationBuilder().SetBasePath(currentDir).AddJsonFile("appsettings.json")
@@ -43,9 +46,9 @@ module DB =
 
   let insertNewArticle (article : Article) (dbClient : IMongoDatabase) = 
     let profileDetails = BsonDocument([
-                                        BsonElement("username", BsonValue.Create article.article.author.username);
+                                        BsonElement("username", BsonValue.Create (checkNullString article.article.author.username));
                                         BsonElement("bio", BsonValue.Create article.article.author.bio);
-                                        BsonElement("image", BsonValue.Create article.article.author.image);
+                                        BsonElement("image", BsonValue.Create (checkNullString article.article.author.image));
                                         BsonElement("following", BsonValue.Create article.article.author.following);
                                       ])
     let articleDetails = BsonDocument([
@@ -74,10 +77,9 @@ module DB =
     let client = MongoClient(mongoConn)
     client.GetDatabase((currentDir |> getConfigDbConnection).GetValue("ConnectionStrings:dbname"))
   
-  let registerWithBson (dbClient: IMongoDatabase) (request: UserRequest) = 
-    // TODO: Add the password hash
+  let registerWithBson (dbClient: IMongoDatabase) (request: UserRequest) =     
     let details = BsonDocument ([
-                                  BsonElement("username", BsonValue.Create request.user.username);
+                                  BsonElement("username", BsonValue.Create (checkNullString request.user.username));
                                   BsonElement("email", BsonValue.Create request.user.email);
                                   BsonElement("token", BsonValue.Create "");
                                   BsonElement("bio", BsonValue.Create "");

@@ -50,7 +50,7 @@ module Actions =
 
   let currentUserByEmail dbClient email = 
     (getUser dbClient email).Value
-    |> BsonDocConverter.toUser
+    |> BsonDocConverter.toProfile
     |> jsonToString
 
   let getCurrentUser dbClient httpContext = 

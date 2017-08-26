@@ -64,7 +64,7 @@ module Convert =
     bio = "";
     image = "";
     following = false;
-  }
+  }  
 
   let checkNullAuthor (art: Article) = 
     if obj.ReferenceEquals(art.article.author, null) then 
@@ -83,6 +83,8 @@ module Convert =
       }
     else
       art
+  
+  let checkNullString field = if obj.ReferenceEquals(field, null) then "" else field
 
   let checkFavoriteIds (art: Article) = 
     if obj.ReferenceEquals(art.article.favoriteIds, null) then 
@@ -101,4 +103,4 @@ module Convert =
       
       {art with article = { art.article with slug = wordSections}}
     else
-      art
+      art 

@@ -25,5 +25,6 @@ let tests =
     testCase "Current working test for trying out impure functions" <| fun _ ->
       // This test can be used to testing individual functions if you don't want to use 
       // F# interactive
+      
       Expect.equal true true String.Empty   
   ]

@@ -22,8 +22,18 @@ module BsonDocConverter =
       image = bdoc.GetElement("image").Value.ToString() 
     }
 
+  let toProfileDetail (bdoc: BsonDocument) : ProfileDetails = {
+    username = bdoc.["username"].AsString //bdoc.GetElement("username").Value.ToString()
+    bio = bdoc.GetElement("bio").Value.ToString()
+    image = bdoc.GetElement("image").Value.ToString() 
+    following = false
+  }
+
   let toUser (bdocUser: BsonDocument) = 
     { user = (toUserDetail (bdocUser.GetElement("user").Value.AsBsonDocument)) }
+
+  let toProfile (bdocUser: BsonDocument) : Profile =
+    { profile = (toProfileDetail (bdocUser.GetElement("user").Value.AsBsonDocument))}
   
   let toHash (bdocUser: BsonDocument) = 
     let currentUser = Seq.find (fun (user:BsonElement) -> user.Name = "user") bdocUser
