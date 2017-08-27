@@ -3,6 +3,7 @@ namespace RealWorld
   module Models =
     open MongoDB.Bson
     open MongoDB.Bson.Serialization.Attributes
+    open System
 
     type UserRequestDetails = {
       username : string;
@@ -87,11 +88,11 @@ namespace RealWorld
     }
 
     type CommentDetails = {
-      id : string;
-      createdAt : string;
-      updatedAt : string;
+      articleId : string;
+      createdAt : DateTime;
+      updatedAt : DateTime;
       body : string;
-      author : ProfileDetails;
+      //author : ProfileDetails;
     }
 
     type CommentBody = {
@@ -111,6 +112,9 @@ namespace RealWorld
     }
 
     type Comment = {
+      [<BsonId>]
+      [<BsonRepresentation(BsonType.ObjectId)>]
+      Id      : string;
       comment : CommentDetails;
     }
 

@@ -182,17 +182,20 @@ module DB =
   let saveNewComment (comment: RequestComment) articleId (dbClient: IMongoDatabase) =
     let collection = dbClient.GetCollection<BsonDocument> "Comment"    
     let commentDetails = BsonDocument([
-                                        BsonElement("id",BsonValue.Create articleId);
+                                        BsonElement("articleId",BsonValue.Create articleId);
                                         BsonElement("createdAt",BsonDateTime.Create DateTime.Now);
                                         BsonElement("updatedAt",BsonDateTime.Create DateTime.Now);
                                         BsonElement("body",BsonValue.Create comment.comment.body);
                                       ])
-    collection.InsertOne commentDetails
+    let commentToInsert = BsonDocument ([
+                                          BsonElement("comment", commentDetails)
+                                        ])
+    collection.InsertOne commentToInsert
     comment
 
-  let getCommentsWithArticleId art (dbClient: IMongoDatabase) = 
-    let collection = dbClient.GetCollection<Comment> "Comment"
-    let commentFilter = Builders.Filter.Eq((fun comment -> comment.comment.id), art.Id.ToString())
+  let getCommentsWithArticleId (art: Article) (dbClient: IMongoDatabase) =     
+    let collection = dbClient.GetCollection<Comment> "Comment"    
+    let commentFilter = Builders.Filter.Eq((fun comment -> comment.comment.articleId), art.Id.ToString())
     collection.Find(commentFilter).ToList() |> List.ofSeq
 
   let getCommentsFromArticlesBySlug slug (dbClient: IMongoDatabase) =
@@ -204,5 +207,5 @@ module DB =
 
   let deleteWithCommentId id (dbClient: IMongoDatabase) =
     let collection = dbClient.GetCollection<Comment> "Comment"
-    collection.DeleteOne(Builders.Filter.Eq((fun comment -> comment.comment.id), id)).DeletedCount > 0L
+    collection.DeleteOne(Builders.Filter.Eq((fun comment -> comment.comment.articleId), id)).DeletedCount > 0L
     
