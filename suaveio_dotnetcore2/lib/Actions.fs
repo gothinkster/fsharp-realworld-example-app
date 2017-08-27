@@ -15,25 +15,19 @@ module Actions =
   let jsonToString (json: 'a) = 
     Newtonsoft.Json.JsonConvert.SerializeObject(json)
 
-  let extractStringQueryVal (queryParameters : HttpRequest) name =
+  let tagQueryPart queryValue = sprintf """"article.tagList" : ["%s"]""" queryValue
+  let authorQueryPart queryValue = sprintf """"article.author.username" : %s""" queryValue
+  let favoriteQueryPart queryValue = sprintf """"article.author.username" : %s, "article.favorited" : true""" queryValue  
+
+  let extractStringQueryVal (queryParameters : HttpRequest) name queryPart =
     match queryParameters.queryParam name with
-    | Choice1Of2 queryVal -> queryVal
+    | Choice1Of2 queryVal -> " " + queryPart queryVal
     | Choice2Of2 _ -> String.Empty
 
   let extractNumericQueryVal (queryParameters : HttpRequest) name = 
     match queryParameters.queryParam name with
     | Choice1Of2 limit -> Convert.ToInt32 limit
-    | Choice2Of2 _ -> 0
-    
-  let routeByOptions (queryParameters : HttpRequest) =
-    let listArticleOptions = {
-      Limit = extractNumericQueryVal queryParameters "limit";
-      Tag = extractStringQueryVal queryParameters "tag";
-      Author = extractStringQueryVal queryParameters "author";
-      Favorited = extractStringQueryVal queryParameters "favorited";
-      Offset = extractNumericQueryVal queryParameters "offset";
-    }
-    (Successful.OK "")
+    | Choice2Of2 _ -> 0  
     
   let hashPassword (request: UserRequest) = 
     {request with user = { request.user with hash = RealWorld.Hash.Crypto.fastHash request.user.password } }
@@ -122,16 +116,35 @@ module Actions =
     |> jsonToString
     |> Successful.OK 
 
-  let getArticles dbClient httpContext =      
-    printfn "Query for article: %A" httpContext.request.rawQuery 
-    // TODO: Passed the expression query to get the articles
-    Auth.useToken httpContext (fun token -> async {
-      try 
-        let articles = 
-          getSavedArticles dbClient
-          |> RealWorld.BsonDocConverter.toArticleList
-          |> jsonToString         
+  let chooseQuery (ctx: HttpContext) =     
+    sprintf "{%s%s%s}" 
+      (extractStringQueryVal ctx.request "tag" tagQueryPart)
+      (extractStringQueryVal ctx.request "author" authorQueryPart)   
+      (extractStringQueryVal ctx.request "favorited" favoriteQueryPart)                  
 
+  let getArticles dbClient httpContext =              
+    Auth.useToken httpContext (fun token -> async {
+      try             
+        // Not very efficient but I have to do this since I could not find documentation on doing limit and skip in mongo
+        let options = (extractNumericQueryVal httpContext.request "limit", extractNumericQueryVal httpContext.request "offset")
+        
+        let articles = 
+          match options with
+          | (limit, _) when limit > 0 -> 
+            getSavedArticles dbClient (chooseQuery httpContext)
+            |> RealWorld.BsonDocConverter.toArticleList
+            |> Seq.take limit
+            |> jsonToString
+          | (_,offset) when offset > 0 -> 
+            getSavedArticles dbClient (chooseQuery httpContext)
+            |> RealWorld.BsonDocConverter.toArticleList
+            |> Seq.skip offset
+            |> jsonToString
+          | _ -> 
+            getSavedArticles dbClient (chooseQuery httpContext)
+            |> RealWorld.BsonDocConverter.toArticleList
+            |> jsonToString              
+        
         return! Successful.OK articles httpContext
       with ex ->
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
@@ -151,7 +164,8 @@ module Actions =
     })
     
 
-  let addArticleWithSlug json (slug: string) (dbClient: MongoDB.Driver.IMongoDatabase) = 
+  let addArticleWithSlug json (slug: string) (dbClient: MongoDB.Driver.IMongoDatabase) =
+    // This should be updating an article by the slug 
     let currentArticle = json |> Suave.Json.fromJson<Article> 
     let updatedSlug = { currentArticle.article with slug = slug}
     

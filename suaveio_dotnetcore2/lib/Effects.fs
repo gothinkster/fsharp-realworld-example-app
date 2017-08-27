@@ -3,6 +3,7 @@ namespace RealWorld.Effects
 module DB =
   open Microsoft.Extensions.Configuration
   open MongoDB.Driver
+  
   open System.IO
   open RealWorld.Models 
   open MongoDB.Bson
@@ -24,11 +25,13 @@ module DB =
     let numberOfTagDocs = collection.AsQueryable().ToList().Count
     if numberOfTagDocs > 0 then Some (collection.AsQueryable().First()) else None
  
-  let getSavedArticles (dbClient : IMongoDatabase) =    
-    let collection = dbClient.GetCollection<BsonDocument>("Article")    
-    let articleList = collection.AsQueryable()
+  let getSavedArticles (dbClient : IMongoDatabase) (queryString: string) =    
+    let collection = dbClient.GetCollection<BsonDocument>("Article")   
+    let filter = FilterDefinition<BsonDocument>.op_Implicit(queryString)
+        
+    let articleList = collection.Find(filter)                                  
                                 .ToList()
-                                |> List.ofSeq
+                                |> List.ofSeq    
                                 
     if not (List.isEmpty articleList) then Some (articleList) else None
 
