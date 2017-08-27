@@ -101,7 +101,8 @@ module Actions =
     })
 
 
-  let getArticlesBy slug dbClient =    
+  let getArticlesBy slug dbClient =  
+    printfn "Getting articles by"   
     getArticleBySlug dbClient slug
     |> RealWorld.Convert.extractArticleList
     |> jsonToString
@@ -121,7 +122,9 @@ module Actions =
     |> jsonToString
     |> Successful.OK 
 
-  let getArticles dbClient httpContext = 
+  let getArticles dbClient httpContext =      
+    printfn "Query for article: %A" httpContext.request.rawQuery 
+    // TODO: Passed the expression query to get the articles
     Auth.useToken httpContext (fun token -> async {
       try 
         let articles = 

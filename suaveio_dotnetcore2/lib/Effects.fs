@@ -9,11 +9,8 @@ module DB =
   open MongoDB.Driver.Linq
   open System
   open RealWorld.Convert
-
-  // TODO: Convert side effects to return option types
+  
   let currentDir = Directory.GetCurrentDirectory()
-
-
 
   let getConfigDbConnection currentDir = 
     let builder = ConfigurationBuilder().SetBasePath(currentDir).AddJsonFile("appsettings.json")
@@ -27,10 +24,9 @@ module DB =
     let numberOfTagDocs = collection.AsQueryable().ToList().Count
     if numberOfTagDocs > 0 then Some (collection.AsQueryable().First()) else None
  
-  let getSavedArticles (dbClient : IMongoDatabase) =
-    // TODO: Add sort by date desc to query
-    let collection = dbClient.GetCollection<BsonDocument>("Article")
-    let articleList = collection.Find(Builders<BsonDocument>.Filter.Empty)
+  let getSavedArticles (dbClient : IMongoDatabase) =    
+    let collection = dbClient.GetCollection<BsonDocument>("Article")    
+    let articleList = collection.AsQueryable()
                                 .ToList()
                                 |> List.ofSeq
                                 

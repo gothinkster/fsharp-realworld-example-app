@@ -5,6 +5,11 @@ namespace RealWorld
     open MongoDB.Bson.Serialization.Attributes
     open System
 
+    type ArticleQuery = 
+      | Author of string
+      | Favorited of string
+      | Tag of string
+
     type UserRequestDetails = {
       username : string;
       email : string;
