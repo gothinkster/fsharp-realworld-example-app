@@ -36,10 +36,10 @@ let app (dbClient: IMongoDatabase) =
     GET >=> choose [
       path "/user" >=> getCurrentUser dbClient
       pathScan "/profile/%s" (fun username -> userProfile dbClient username)
+      pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
       path "/articles" >=> articles dbClient
       path "/articles/feed" >=> articlesForFeed dbClient
-      pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
-      pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
+      pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)      
       path "/tags" >=> getTagList dbClient
     ]
 
