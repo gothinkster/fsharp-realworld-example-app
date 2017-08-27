@@ -141,8 +141,7 @@ module DB =
     let requestedArticle = collection.AsQueryable().Where(fun art -> art.article.slug = slug).ToList() |> List.ofSeq |> List.first
     match requestedArticle with
     | Some art -> 
-      let currentUser = (getUser dbClient username).Value |> RealWorld.BsonDocConverter.toUserId
-      // TODO: Only updated if they haven't updated before
+      let currentUser = (getUser dbClient username).Value |> RealWorld.BsonDocConverter.toUserId      
       let updatedFavoriteArticle = Builders.Update.Set((fun doc -> doc.article.favoriteIds), Array.append requestedArticle.Value.article.favoriteIds [|currentUser|])    
       collection.UpdateOne((fun art -> art.article.slug = slug), updatedFavoriteArticle) |> ignore    
       

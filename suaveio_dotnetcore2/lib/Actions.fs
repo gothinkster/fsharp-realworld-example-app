@@ -202,8 +202,7 @@ module Actions =
     |> jsonToString
     |> Successful.OK
 
-  let favoriteArticle slug dbClient httpContext = 
-    // TODO: Get the current user, then get the article by the slug and add the object id to the users favorite list
+  let favoriteArticle slug dbClient httpContext =     
      Auth.useToken httpContext (fun token -> async {
       try  
         favoriteArticleForUser dbClient token.UserName slug |> ignore
