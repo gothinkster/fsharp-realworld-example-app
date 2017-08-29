@@ -95,8 +95,7 @@ module Actions =
     })
 
 
-  let getArticlesBy slug dbClient =  
-    printfn "Getting articles by"   
+  let getArticlesBy slug dbClient =         
     getArticleBySlug dbClient slug
     |> RealWorld.Convert.extractArticleList
     |> jsonToString
@@ -140,8 +139,7 @@ module Actions =
             |> RealWorld.BsonDocConverter.toArticleList
             |> Seq.skip offset
             |> jsonToString
-          | _ -> 
-            printfn "Query: %A" (chooseQuery httpContext)
+          | _ ->             
             getSavedArticles dbClient (chooseQuery httpContext)
             |> RealWorld.BsonDocConverter.toArticleList
             |> jsonToString              
