@@ -4,8 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="lib/Models.fs" />
-    <Compile Include="lib/Json.fs" />
+    <Compile Include="lib/Models.fs" />    
     <Compile Include="lib/Convert.fs" />
     <Compile Include="lib/BsonDocConverter.fs" />
     <Compile Include="lib/Effects.fs" />
@@ -14,7 +13,6 @@
     <Compile Include="lib/Auth.fs" />
     <Compile Include="lib/Actions.fs" />
     <Compile Include="Program.fs" />
-    <PackageReference Include="Fable.JsonConverter" Version="1.0.1" />
     <PackageReference Include="jose-jwt" Version="2.4.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
     <PackageReference Include="Microsoft.DotNet.Watcher.Tools" Version="2.0.0" />

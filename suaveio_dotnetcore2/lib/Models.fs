@@ -4,6 +4,7 @@ namespace RealWorld
     open MongoDB.Bson
     open MongoDB.Bson.Serialization.Attributes
     open System
+    open Newtonsoft.Json
 
     type ArticleQuery = 
       | Author of string
@@ -73,6 +74,7 @@ namespace RealWorld
       body           : string;
       createdAt      : System.DateTime;
       updatedAt      : System.DateTime;
+      [<JsonIgnore>]
       favoriteIds    : string array;      
       favorited      : bool;
       favoritesCount : uint32;
@@ -84,6 +86,7 @@ namespace RealWorld
       article : ArticleDetails;
       [<BsonId>]
       [<BsonRepresentation(BsonType.ObjectId)>]
+      [<JsonIgnore>]
       Id      : string;
     }  
 
@@ -93,6 +96,7 @@ namespace RealWorld
     }
 
     type CommentDetails = {
+      [<JsonIgnore>]
       articleId : string;
       createdAt : DateTime;
       updatedAt : DateTime;
@@ -119,6 +123,7 @@ namespace RealWorld
     type Comment = {
       [<BsonId>]
       [<BsonRepresentation(BsonType.ObjectId)>]
+      [<JsonIgnore>]
       Id      : string;
       comment : CommentDetails;
     }
@@ -134,7 +139,7 @@ namespace RealWorld
 
     type ErrorBody = {
       body : string array;
-    }
+    }     
 
     type ErrorReport = {
       errors : ErrorBody;
