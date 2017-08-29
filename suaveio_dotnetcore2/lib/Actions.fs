@@ -16,8 +16,8 @@ module Actions =
     Newtonsoft.Json.JsonConvert.SerializeObject(json)
 
   let tagQueryPart queryValue = sprintf """"article.tagList" : ["%s"]""" queryValue
-  let authorQueryPart queryValue = sprintf """"article.author.username" : %s""" queryValue
-  let favoriteQueryPart queryValue = sprintf """"article.author.username" : %s, "article.favorited" : true""" queryValue  
+  let authorQueryPart queryValue = sprintf """"article.author.username" : "%s" """ queryValue
+  let favoriteQueryPart queryValue = sprintf """"article.author.username" : "%s", "article.favorited" : true""" queryValue  
 
   let extractStringQueryVal (queryParameters : HttpRequest) name queryPart =
     match queryParameters.queryParam name with
@@ -141,6 +141,7 @@ module Actions =
             |> Seq.skip offset
             |> jsonToString
           | _ -> 
+            printfn "Query: %A" (chooseQuery httpContext)
             getSavedArticles dbClient (chooseQuery httpContext)
             |> RealWorld.BsonDocConverter.toArticleList
             |> jsonToString              
