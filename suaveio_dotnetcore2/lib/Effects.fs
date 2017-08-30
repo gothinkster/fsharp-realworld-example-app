@@ -25,14 +25,16 @@ module DB =
     let numberOfTagDocs = collection.AsQueryable().ToList().Count
     if numberOfTagDocs > 0 then Some (collection.AsQueryable().First()) else None
  
-  let getSavedArticles (dbClient : IMongoDatabase) (queryString: string) =    
+  let getSavedArticles (dbClient : IMongoDatabase) (queryString: string) (options:ArticleQueryOption) =    
     let collection = dbClient.GetCollection<BsonDocument>("Article")   
     let filter = FilterDefinition<BsonDocument>.op_Implicit(queryString)
         
-    let articleList = collection.Find(filter)                                  
-                                .ToList()
-                                |> List.ofSeq    
-                                
+    let articleList = 
+      match options with
+      | Limit amount -> collection.Find(filter).Limit(Nullable<int>(amount)).ToList() |> List.ofSeq
+      | Offset amount -> collection.Find(filter).Skip(Nullable<int>(amount)).ToList() |> List.ofSeq
+      | Neither -> collection.Find(filter).ToList() |> List.ofSeq
+     
     if not (List.isEmpty articleList) then Some (articleList) else None
 
   let getSavedFollowedArticles (dbClient : IMongoDatabase) = 

@@ -3,15 +3,8 @@ open Suave
 open Suave.Http
 open Suave.Operators
 open Suave.Filters
-open Suave.Json
-open System.IO
-open Microsoft.Extensions.Configuration
 open MongoDB.Driver
-open RealWorld.Models
-open RealWorld.Effects.DB
 open RealWorld.Effects.Actions
-open MongoDB.Bson
-open Newtonsoft.Json
 
 let serverConfig = 
   let randomPort = Random().Next(7000, 7999)
@@ -30,13 +23,14 @@ let removeFavArticle slug dbClient = removeFavoriteCurrentUser slug dbClient
 let mapJsonToArticle dbClient      = createNewArticle dbClient 
 let deleteArticle dbClient slug    = deleteArticleBy slug dbClient
 let addComment dbClient slug       = addCommentBy slug dbClient
+let getComments slug dbClient      = getCommentsBySlug slug dbClient
   
 let app (dbClient: IMongoDatabase) = 
   choose [
     GET >=> choose [
       path "/user" >=> getCurrentUser dbClient
       pathScan "/profile/%s" (fun username -> userProfile dbClient username)
-      pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
+      pathScan "/articles/%s/comments" (fun slug -> getComments slug dbClient)
       path "/articles/feed" >=> articlesForFeed dbClient
       pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)      
       path "/articles" >=> articles dbClient

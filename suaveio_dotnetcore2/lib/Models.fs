@@ -6,10 +6,10 @@ namespace RealWorld
     open System
     open Newtonsoft.Json
 
-    type ArticleQuery = 
-      | Author of string
-      | Favorited of string
-      | Tag of string
+    type ArticleQueryOption = 
+      | Limit of int
+      | Offset of int
+      | Neither
 
     type UserRequestDetails = {
       username : string;

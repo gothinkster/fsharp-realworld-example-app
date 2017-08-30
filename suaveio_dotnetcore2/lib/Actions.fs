@@ -86,7 +86,7 @@ module Actions =
           |> RealWorld.Convert.checkNullSlug
           |> RealWorld.Convert.checkFavoriteIds
           |> RealWorld.Convert.addDefaultSlug
-        
+ 
         insertNewArticle checkedArticle dbCLient |> ignore
     
         return! Successful.OK (checkedArticle |> jsonToString) httpContext
@@ -94,8 +94,8 @@ module Actions =
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
 
-
-  let getArticlesBy slug dbClient =         
+  // Authentication is not needed for getting an article by the slug
+  let getArticlesBy slug dbClient  =         
     getArticleBySlug dbClient slug
     |> RealWorld.Convert.extractArticleList
     |> jsonToString
@@ -124,23 +124,20 @@ module Actions =
   let getArticles dbClient httpContext =              
     Auth.useToken httpContext (fun token -> async {
       try             
-        // Not very efficient but I have to do this since I could not find documentation on doing limit and skip in mongo
         let options = (extractNumericQueryVal httpContext.request "limit", extractNumericQueryVal httpContext.request "offset")
-        
+        // TODO: Refactor so this so that a client can limit and offset at the same time; Use Sum type
         let articles = 
           match options with
-          | (limit, _) when limit > 0 -> 
-            getSavedArticles dbClient (chooseQuery httpContext)
+          | (limitAmount, _) when limitAmount > 0 -> 
+            getSavedArticles dbClient (chooseQuery httpContext) (Limit limitAmount)
             |> RealWorld.BsonDocConverter.toArticleList
-            |> Seq.take limit
             |> jsonToString
-          | (_,offset) when offset > 0 -> 
-            getSavedArticles dbClient (chooseQuery httpContext)
+          | (_,offsetAmount) when offsetAmount > 0 -> 
+            getSavedArticles dbClient (chooseQuery httpContext) (Offset offsetAmount)
             |> RealWorld.BsonDocConverter.toArticleList
-            |> Seq.skip offset
             |> jsonToString
           | _ ->             
-            getSavedArticles dbClient (chooseQuery httpContext)
+            getSavedArticles dbClient (chooseQuery httpContext) (Neither)
             |> RealWorld.BsonDocConverter.toArticleList
             |> jsonToString              
         
@@ -181,7 +178,8 @@ module Actions =
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })    
 
-  let addCommentBy rawJson slug dbClient  =   
+  let addCommentBy rawJson slug dbClient  = 
+    // TODO: User should be authenticated to add a comment  
     let json = rawJson |> System.Text.Encoding.UTF8.GetString
     let possibleArticleId = getArticleBySlug dbClient slug
     match possibleArticleId with
@@ -191,15 +189,27 @@ module Actions =
     | None -> 
       Successful.OK ({errors = {body = [|"Could not find article by slug"|]}} |> jsonToString) 
 
-  let getCommentsBySlug slug dbClient = 
-    getCommentsFromArticlesBySlug slug dbClient
-    |> jsonToString
-    |> Successful.OK 
+  let getCommentsBySlug slug dbClient httpContext = 
+    Auth.useToken httpContext (fun token -> async {
+      try
+        let comments = 
+          getCommentsFromArticlesBySlug slug dbClient
+          |> jsonToString
 
-  let deleteComment (_, (id: string)) dbCLient = 
-    deleteWithCommentId id dbCLient
-    |> jsonToString
-    |> Successful.OK
+        return! Successful.OK comments httpContext
+      with ex ->    
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
+
+  let deleteComment (_, (id: string)) dbCLient httpContext = 
+    Auth.useToken httpContext (fun token -> async{
+      try
+        let result =
+          deleteWithCommentId id dbCLient
+        return! Successful.OK "" httpContext
+      with ex -> 
+        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+    })
 
   let favoriteArticle slug dbClient httpContext =     
      Auth.useToken httpContext (fun token -> async {
