@@ -37,3 +37,5 @@ tests/bin
 test/obj
 tests/obj
 aspnetmvc/obj
+suaveio_dotnetcore2.sln
+suaveio_dotnetcore2.userprefs
