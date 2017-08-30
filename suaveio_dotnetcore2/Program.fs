@@ -48,6 +48,7 @@ let app (dbClient: IMongoDatabase) =
 
     PUT >=> choose [
       path "/user" >=> updateCurrentUser dbClient
+      // TODO: This should be updating the article, not adding it
       pathScan "/articles/%s" (fun slug -> request(fun req -> addArticleWithSlug req.rawForm slug dbClient))
     ]
 
