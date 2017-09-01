@@ -8,7 +8,7 @@ open RealWorld.Effects.Actions
 
 let serverConfig = 
   let randomPort = Random().Next(7000, 7999)
-  { defaultConfig with bindings = [HttpBinding.createSimple HTTP "127.0.0.1" randomPort] }
+  { defaultConfig with bindings = [ HttpBinding.createSimple HTTP "127.0.0.1" randomPort ] }
 
 // curried functions so we can pass the database client to the actions
 let validateCredentials dbClient   = RealWorld.Auth.loginWithCredentials dbClient
@@ -63,8 +63,6 @@ let app (dbClient: IMongoDatabase) =
 
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
-
-open RealWorld.Effects.DB
 
 [<EntryPoint>]
 let main argv = 
