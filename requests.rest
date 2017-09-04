@@ -1,0 +1,65 @@
+@port_number = 7269
+@token = eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJVc2VyTmFtZSI6ImxlZS5icnlhbnRAZ21haWwuY29tIn0.
+@slug = how-to-train-your-dragon
+
+## Login user
+POST http://localhost:{{port_number}}/users/login HTTP/1.1
+content-type: application/json
+
+{
+  "user": {
+    "email": "lee.bryant@gmail.com",
+    "password": "test"
+  }
+}
+
+########
+
+## Register new user
+POST http://localhost:{{port_number}}/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "user": {
+    "email": "john@jacob.com",
+    "password": "johnnyjacob",
+    "username": "johnjacob"
+  }
+}
+
+########
+
+## Current user
+GET http://localhost:{{port_number}}/user HTTP/1.1
+Content-Type: application/json
+Authorization: Token {{token}}
+
+########
+
+## Update user
+PUT http://localhost:{{port_number}}/user HTTP/1.1
+Content-Type: application/json
+Authorization: Token {{token}}
+
+{"user":{"email":"john@jacob.com"}}
+
+########
+
+## Get article feed [:feed]
+GET http://localhost:{{port_number}}/articles/feed HTTP/1.1
+Content-Type: application/json
+Authorization: Token {{token}}
+
+########
+
+## Articles [:article]
+GET http://localhost:{{port_number}}/articles HTTP/1.1
+Content-Type: application/json
+Authorization: Token {{token}}
+
+########
+
+## Get Comments [:comments]
+GET http://localhost:{{port_number}}/articles/{{slug}}/comments
+Content-Type: application/json
+Authorization: Token {{token}}

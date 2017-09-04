@@ -6,7 +6,7 @@ open Suave.Filters
 open MongoDB.Driver
 open RealWorld.Effects.Actions
 
-let serverConfig = 
+let serverConfig =
   let randomPort = Random().Next(7000, 7999)
   { defaultConfig with bindings = [ HttpBinding.createSimple HTTP "127.0.0.1" randomPort ] }
 
@@ -20,30 +20,30 @@ let articles dbClient              = getArticles dbClient
 let articlesForFeed dbClient       = getArticlesForFeed dbClient
 let favArticle slug dbClient       = favoriteArticle slug dbClient
 let removeFavArticle slug dbClient = removeFavoriteCurrentUser slug dbClient
-let mapJsonToArticle dbClient      = createNewArticle dbClient 
+let mapJsonToArticle dbClient      = createNewArticle dbClient
 let deleteArticle dbClient slug    = deleteArticleBy slug dbClient
 let addComment dbClient slug       = addCommentBy slug dbClient
 let getComments slug dbClient      = getCommentsBySlug slug dbClient
-  
-let app (dbClient: IMongoDatabase) = 
+
+let app (dbClient: IMongoDatabase) =
   choose [
     GET >=> choose [
       path "/user" >=> getCurrentUser dbClient
       pathScan "/profile/%s" (fun username -> userProfile dbClient username)
       pathScan "/articles/%s/comments" (fun slug -> getComments slug dbClient)
       path "/articles/feed" >=> articlesForFeed dbClient
-      pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)      
+      pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
       path "/articles" >=> articles dbClient
       path "/tags" >=> getTagList dbClient
     ]
 
     POST >=> choose [
-      pathScan "/articles/%s/favorite" (fun slug -> favArticle slug dbClient)     
+      pathScan "/articles/%s/favorite" (fun slug -> favArticle slug dbClient)
       path "/users/login" >=> validateCredentials dbClient
       path "/users" >=> registerNewUser dbClient
       pathScan "/profiles/%s/follow" (fun username -> followUser dbClient username)
-      pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))        
-      path "/articles" >=> mapJsonToArticle dbClient 
+      pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))
+      path "/articles" >=> mapJsonToArticle dbClient
     ]
 
     PUT >=> choose [
@@ -54,17 +54,17 @@ let app (dbClient: IMongoDatabase) =
 
     DELETE >=> choose [
       pathScan "/profiles/%s/follow" (fun username -> unfollowUser dbClient username)
-      pathScan "/articles/%s/favorite" (fun slug -> removeFavArticle slug dbClient)  
+      pathScan "/articles/%s/favorite" (fun slug -> removeFavArticle slug dbClient)
       pathScan "/articles/%s/comments/%s" (fun slugAndId -> deleteComment slugAndId dbClient)
       pathScan "/articles/%s" (fun slug -> deleteArticle dbClient slug)
-      
-      RequestErrors.NOT_FOUND "Route not found"  
+
+      RequestErrors.NOT_FOUND "Route not found"
     ]
 
     path "/" >=> (Successful.OK "This will return the base page.")
   ]
 
 [<EntryPoint>]
-let main argv = 
+let main argv =
   startWebServer serverConfig (RealWorld.Effects.DB.getDBClient () |> app)
   0
