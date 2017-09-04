@@ -159,16 +159,18 @@ module Actions =
   let deleteArticleBy slug dbClient httpContext =
     withToken httpContext (fun token -> deleteArticleBySlug slug dbClient |> ignore; String.Empty)
 
-  let addCommentBy rawJson slug dbClient  =
-    // TODO: User should be authenticated to add a comment
-    let json = rawJson |> System.Text.Encoding.UTF8.GetString
-    let possibleArticleId = getArticleBySlug dbClient slug
-    match possibleArticleId with
-    | Some articleId ->
-      saveNewComment (JsonConvert.DeserializeObject<RequestComment> json ) (articleId.Id.ToString()) dbClient |> ignore
-      Successful.OK (json |> jsonToString)
-    | None ->
-      Successful.OK ({errors = {body = [|"Could not find article by slug"|]}} |> jsonToString)
+  let addCommentBy slug dbClient httpContext  =
+    withToken httpContext (fun token -> 
+      let json = httpContext.request.rawForm |> System.Text.Encoding.UTF8.GetString
+      let possibleArticleId = getArticleBySlug dbClient slug
+      match possibleArticleId with
+      | Some articleId ->
+        saveNewComment (JsonConvert.DeserializeObject<RequestComment> json ) (articleId.Id.ToString()) dbClient |> ignore
+        json |> jsonToString
+      | None ->
+        {errors = {body = [|"Could not find article by slug"|]}} |> jsonToString
+    )
+    
 
   let getCommentsBySlug slug dbClient httpContext =
     withToken httpContext (fun token ->

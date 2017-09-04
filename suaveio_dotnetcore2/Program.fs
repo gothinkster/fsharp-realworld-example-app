@@ -42,7 +42,7 @@ let app (dbClient: IMongoDatabase) =
       path "/users/login" >=> validateCredentials dbClient
       path "/users" >=> registerNewUser dbClient
       pathScan "/profiles/%s/follow" (fun username -> followUser dbClient username)
-      pathScan "/articles/%s/comments" (fun slug -> request( fun req -> addCommentBy req.rawForm slug dbClient))
+      pathScan "/articles/%s/comments" (fun slug -> addComment dbClient slug) 
       path "/articles" >=> mapJsonToArticle dbClient
     ]
 
