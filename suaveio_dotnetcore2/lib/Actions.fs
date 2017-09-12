@@ -1,6 +1,6 @@
 namespace RealWorld.Effects
 
-module Actions = 
+module Actions =
   open Suave
   open RealWorld.Models
   open DB
@@ -12,90 +12,85 @@ module Actions =
   open Newtonsoft.Json
   open RealWorld.Hash
 
-  let jsonToString (json: 'a) = 
+  let jsonToString (json: 'a) =
     Newtonsoft.Json.JsonConvert.SerializeObject(json)
 
-  let tagQueryPart queryValue = sprintf """"article.tagList" : ["%s"]""" queryValue
-  let authorQueryPart queryValue = sprintf """"article.author.username" : "%s" """ queryValue
-  let favoriteQueryPart queryValue = sprintf """"article.author.username" : "%s", "article.favorited" : true""" queryValue  
+  let tagQueryPart queryValue      = sprintf """"article.tagList" : ["%s"]""" queryValue
+  let authorQueryPart queryValue   = sprintf """"article.author.username" : "%s" """ queryValue
+  let favoriteQueryPart queryValue = sprintf """"article.author.username" : "%s", "article.favorited" : true""" queryValue
 
   let extractStringQueryVal (queryParameters : HttpRequest) name queryPart =
     match queryParameters.queryParam name with
     | Choice1Of2 queryVal -> " " + queryPart queryVal
     | Choice2Of2 _ -> String.Empty
 
-  let extractNumericQueryVal (queryParameters : HttpRequest) name = 
+  let extractNumericQueryVal (queryParameters : HttpRequest) name =
     match queryParameters.queryParam name with
     | Choice1Of2 limit -> Convert.ToInt32 limit
-    | Choice2Of2 _ -> 0  
-    
-  let hashPassword (request: UserRequest) = 
+    | Choice2Of2 _ -> 0
+
+  let hashPassword (request: UserRequest) =
     {request with user = { request.user with hash = RealWorld.Hash.Crypto.fastHash request.user.password } }
 
-  let registerNewUser dbClient = 
-    request ( fun inputGraph -> 
+  let registerNewUser dbClient =
+    request ( fun inputGraph ->
       Newtonsoft.Json.JsonConvert.DeserializeObject<UserRequest>(inputGraph.rawForm |> System.Text.ASCIIEncoding.UTF8.GetString)
       |> hashPassword
-      |> registerWithBson dbClient 
-      |> RealWorld.Convert.userRequestToUser 
-      |> jsonToString 
+      |> registerWithBson dbClient
+      |> RealWorld.Convert.userRequestToUser
+      |> jsonToString
       |> Successful.OK
     )
 
-  let currentUserByEmail dbClient email = 
+  let currentUserByEmail dbClient email =
     (getUser dbClient email).Value
     |> BsonDocConverter.toProfile
     |> jsonToString
 
-  let getCurrentUser dbClient httpContext = 
-    Auth.useToken httpContext (fun token -> async {
-      try  
-        return! Successful.OK (currentUserByEmail dbClient token.UserName) httpContext
+  let withToken httpContext f =
+    Auth.useToken httpContext (fun token -> async{
+      try
+        let result = f token
+        return! Successful.OK (result) httpContext
       with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
+        return! Suave.RequestErrors.NOT_FOUND "Database error has occured" httpContext
     })
 
-  let updateUser dbClient  httpContext = 
-     Auth.useToken httpContext (fun token -> async {
-      try  
-        let user = JsonConvert.DeserializeObject<UserRequest>( httpContext.request.rawForm |> System.Text.ASCIIEncoding.UTF8.GetString)
-        
-        updateRequestedUser dbClient user |> ignore
+  let getCurrentUser dbClient httpContext =
+    withToken httpContext (fun token -> currentUserByEmail dbClient token.UserName)
 
-        return! Successful.OK (user |> jsonToString) httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })
-  
-  let getUserProfile dbClient username httpContext = 
-    Auth.useToken httpContext (fun token -> async {
-      try 
-        return! Successful.OK (currentUserByEmail dbClient username) httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })
+  let updateUser dbClient  httpContext =
+    withToken httpContext (fun token ->
+      JsonConvert.DeserializeObject<UserRequest>( httpContext.request.rawForm |> System.Text.ASCIIEncoding.UTF8.GetString)
+      |> updateRequestedUser dbClient
+      |> ignore
+      String.Empty
+    )
 
-  let createNewArticle dbCLient httpContext = 
+  let getUserProfile dbClient username httpContext =
+    withToken httpContext (fun token -> currentUserByEmail dbClient username)
+
+  let createNewArticle dbCLient httpContext =
     Auth.useToken httpContext (fun token -> async {
-      try 
-        let newArticle = (JsonConvert.DeserializeObject<Article>(httpContext.request.rawForm |> System.Text.Encoding.UTF8.GetString))  
-    
-        let checkedArticle = 
-          newArticle 
-          |> RealWorld.Convert.checkNullAuthor 
+      try
+        let newArticle = (JsonConvert.DeserializeObject<Article>(httpContext.request.rawForm |> System.Text.Encoding.UTF8.GetString))
+
+        let checkedArticle =
+          newArticle
+          |> RealWorld.Convert.checkNullAuthor
           |> RealWorld.Convert.checkNullSlug
           |> RealWorld.Convert.checkFavoriteIds
           |> RealWorld.Convert.addDefaultSlug
-        
+
         insertNewArticle checkedArticle dbCLient |> ignore
-    
+
         return! Successful.OK (checkedArticle |> jsonToString) httpContext
       with ex ->
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
 
-
-  let getArticlesBy slug dbClient =         
+  // Authentication is not needed for getting an article by the slug
+  let getArticlesBy slug dbClient  =
     getArticleBySlug dbClient slug
     |> RealWorld.Convert.extractArticleList
     |> jsonToString
@@ -110,130 +105,97 @@ module Actions =
     | None -> [||]
 
   let getTagList dbClient =
-    getSavedTagList dbClient 
+    getSavedTagList dbClient
     |> defaultTagsIfEmpty
     |> jsonToString
-    |> Successful.OK 
+    |> Successful.OK
 
-  let chooseQuery (ctx: HttpContext) =     
-    sprintf "{%s%s%s}" 
+  let chooseQuery (ctx: HttpContext) =
+    sprintf "{%s%s%s}"
       (extractStringQueryVal ctx.request "tag" tagQueryPart)
-      (extractStringQueryVal ctx.request "author" authorQueryPart)   
-      (extractStringQueryVal ctx.request "favorited" favoriteQueryPart)                  
+      (extractStringQueryVal ctx.request "author" authorQueryPart)
+      (extractStringQueryVal ctx.request "favorited" favoriteQueryPart)
 
-  let getArticles dbClient httpContext =              
+  let getArticles dbClient httpContext =
     Auth.useToken httpContext (fun token -> async {
-      try             
-        // Not very efficient but I have to do this since I could not find documentation on doing limit and skip in mongo
+      try
         let options = (extractNumericQueryVal httpContext.request "limit", extractNumericQueryVal httpContext.request "offset")
-        
-        let articles = 
+        // TODO: Refactor so this so that a client can limit and offset at the same time; Use Sum type
+        let articles =
           match options with
-          | (limit, _) when limit > 0 -> 
-            getSavedArticles dbClient (chooseQuery httpContext)
+          | (limitAmount, _) when limitAmount > 0 ->
+            getSavedArticles dbClient (chooseQuery httpContext) (Limit limitAmount)
             |> RealWorld.BsonDocConverter.toArticleList
-            |> Seq.take limit
             |> jsonToString
-          | (_,offset) when offset > 0 -> 
-            getSavedArticles dbClient (chooseQuery httpContext)
+          | (_,offsetAmount) when offsetAmount > 0 ->
+            getSavedArticles dbClient (chooseQuery httpContext) (Offset offsetAmount)
             |> RealWorld.BsonDocConverter.toArticleList
-            |> Seq.skip offset
             |> jsonToString
-          | _ ->             
-            getSavedArticles dbClient (chooseQuery httpContext)
+          | _ ->
+            getSavedArticles dbClient (chooseQuery httpContext) (Neither)
             |> RealWorld.BsonDocConverter.toArticleList
-            |> jsonToString              
-        
-        return! Successful.OK articles httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })
-
-  let getArticlesForFeed dbClient httpContext = 
-    Auth.useToken httpContext (fun token -> async {
-      try 
-        let articles = 
-          getSavedFollowedArticles dbClient
-          |> defaultArticleIfEmpty
-          |> jsonToString           
+            |> jsonToString
 
         return! Successful.OK articles httpContext
       with ex ->
         return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
     })
-    
+
+  let getArticlesForFeed dbClient httpContext =
+    withToken httpContext (fun token ->
+      getSavedFollowedArticles dbClient
+      |> defaultArticleIfEmpty
+      |> jsonToString)
 
   let addArticleWithSlug json (slug: string) (dbClient: MongoDB.Driver.IMongoDatabase) =
-    // This should be updating an article by the slug 
-    let currentArticle = json |> Suave.Json.fromJson<Article> 
+    // This should be updating an article by the slug
+    let currentArticle = json |> Suave.Json.fromJson<Article>
     let updatedSlug = { currentArticle.article with slug = slug}
-    
+
     insertNewArticle ({currentArticle with article = updatedSlug }) dbClient
     |> jsonToString
     |> Successful.OK
 
-  let deleteArticleBy slug dbClient httpContext = 
-    Auth.useToken httpContext (fun token -> async {
-      try  
-        deleteArticleBySlug slug dbClient |> ignore
-        return! Successful.OK ("") httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })    
+  let deleteArticleBy slug dbClient httpContext =
+    withToken httpContext (fun token -> deleteArticleBySlug slug dbClient |> ignore; String.Empty)
 
-  let addCommentBy rawJson slug dbClient  =   
-    let json = rawJson |> System.Text.Encoding.UTF8.GetString
-    let possibleArticleId = getArticleBySlug dbClient slug
-    match possibleArticleId with
-    | Some articleId -> 
-      saveNewComment (JsonConvert.DeserializeObject<RequestComment> json ) (articleId.Id.ToString()) dbClient |> ignore
-      Successful.OK (json |> jsonToString)
-    | None -> 
-      Successful.OK ({errors = {body = [|"Could not find article by slug"|]}} |> jsonToString) 
+  let addCommentBy slug dbClient httpContext  =
+    withToken httpContext (fun token -> 
+      let json = httpContext.request.rawForm |> System.Text.Encoding.UTF8.GetString
+      let possibleArticleId = getArticleBySlug dbClient slug
+      match possibleArticleId with
+      | Some articleId ->
+        saveNewComment (JsonConvert.DeserializeObject<RequestComment> json ) (articleId.Id.ToString()) dbClient |> ignore
+        json |> jsonToString
+      | None ->
+        {errors = {body = [|"Could not find article by slug"|]}} |> jsonToString
+    )
+    
 
-  let getCommentsBySlug slug dbClient = 
-    getCommentsFromArticlesBySlug slug dbClient
-    |> jsonToString
-    |> Successful.OK 
+  let getCommentsBySlug slug dbClient httpContext =
+    withToken httpContext (fun token ->
+      getCommentsFromArticlesBySlug slug dbClient
+      |> jsonToString)
 
-  let deleteComment (_, (id: string)) dbCLient = 
-    deleteWithCommentId id dbCLient
-    |> jsonToString
-    |> Successful.OK
+  let deleteComment (_, (id: string)) dbCLient httpContext =
+    withToken httpContext (fun token -> deleteWithCommentId id dbCLient |> ignore; String.Empty)
 
-  let favoriteArticle slug dbClient httpContext =     
-     Auth.useToken httpContext (fun token -> async {
-      try  
-        favoriteArticleForUser dbClient token.UserName slug |> ignore
-        return! Successful.OK ("") httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })
+  let favoriteArticle slug dbClient httpContext =
+    withToken httpContext (fun token ->
+      favoriteArticleForUser dbClient token.UserName slug |> ignore; String.Empty)
 
-  let removeFavoriteCurrentUser slug dbClient httpContext =     
-    Auth.useToken httpContext (fun token -> async {
-      try         
-        removeFavoriteArticleFromUser dbClient token.UserName slug |> ignore
-        return! Successful.OK ("") httpContext  
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })
+  let removeFavoriteCurrentUser slug dbClient httpContext =
+    withToken httpContext (fun token ->
+      removeFavoriteArticleFromUser dbClient token.UserName slug |> ignore; String.Empty)
 
-  let getFollowedProfile dbClient username httpContext = 
-    Auth.useToken httpContext (fun token -> async {
-      try        
-        let profile = followUser dbClient token.UserName username |> Convert.userToProfile
+  let getFollowedProfile dbClient username httpContext =
+    withToken httpContext (fun token ->
+      followUser dbClient token.UserName username
+      |> Convert.userToProfile
+      |> jsonToString)
 
-        return! Successful.OK (profile |> jsonToString) httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })
-
-  let removeFollowedProfile dbClient username httpContext = 
-    Auth.useToken httpContext (fun token -> async {
-      try 
-        let profile = unfollowUser dbClient token.UserName username |> Convert.userToProfile 
-        return! Successful.OK (profile |> jsonToString) httpContext
-      with ex ->
-        return! Suave.RequestErrors.NOT_FOUND "Database not available" httpContext
-    })
+  let removeFollowedProfile dbClient username httpContext =
+    withToken httpContext (fun token ->
+      unfollowUser dbClient token.UserName username
+      |> Convert.userToProfile
+      |> jsonToString)
