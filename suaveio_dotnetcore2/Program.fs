@@ -4,6 +4,7 @@ open Suave.Http
 open Suave.Operators
 open Suave.Filters
 open Suave.Json
+open Suave.Writers
 open System.IO
 open Microsoft.Extensions.Configuration
 open MongoDB.Driver
@@ -12,6 +13,19 @@ open RealWorld.Effects.DB
 open RealWorld.Effects.Actions
 open MongoDB.Bson
 open Newtonsoft.Json
+
+let setCORSHeaders =
+    addHeader  "Access-Control-Allow-Origin" "*"
+    >=> addHeader "Access-Control-Allow-Headers" "content-type"
+
+let allowCors : WebPart =
+    choose [
+        OPTIONS >=>
+            fun context ->
+                context |> (
+                    setCORSHeaders
+                    >=> Successful.OK "CORS approved" )
+    ]
 
 let serverConfig = 
   let randomPort = Random().Next(7000, 7999)
@@ -33,12 +47,13 @@ let addComment dbClient slug       = addCommentBy slug dbClient
   
 let app (dbClient: IMongoDatabase) = 
   choose [
+    allowCors
     GET >=> choose [
       path "/user" >=> getCurrentUser dbClient
       pathScan "/profile/%s" (fun username -> userProfile dbClient username)
       pathScan "/articles/%s/comments" (fun slug -> getCommentsBySlug slug dbClient)
       path "/articles/feed" >=> articlesForFeed dbClient
-      pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)      
+      pathScan "/articles/%s" (fun slug -> getArticlesBy slug dbClient)
       path "/articles" >=> articles dbClient
       path "/tags" >=> getTagList dbClient
     ]
